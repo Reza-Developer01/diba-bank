@@ -171,11 +171,10 @@ export default function ContactsPage({
   const handleSubmit = async (data) => {
     try {
       if (editing) {
-        const updated = await updateContact(editing.id, data);
+        await updateContact(editing.id, data);
 
-        setContacts((items) =>
-          items.map((item) => (item.id === editing.id ? updated : item)),
-        );
+        const updatedContacts = await getContacts();
+        setContacts(updatedContacts);
       } else {
         const created = await createContact(data);
 
