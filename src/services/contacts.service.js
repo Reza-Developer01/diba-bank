@@ -9,7 +9,6 @@ export async function getContacts() {
   }
 
   const data = await response.json();
-  console.log(data);
 
   return data.results ?? [];
 }
@@ -36,11 +35,6 @@ export async function createContact(data) {
         phone: phone.number,
       })),
   };
-
-  console.log(payload);
-
-  console.log("CREATE CONTACT DATA:", data);
-  console.log("CREATE CONTACT PAYLOAD:", payload);
 
   const response = await fetch(`${API_URL}/contacts/`, {
     method: "POST",
@@ -86,8 +80,6 @@ export async function updateContact(id, data) {
         phone: phone.number,
       })),
   };
-
-  console.log(payload);
 
   const response = await fetch(`${API_URL}/contacts/${id}/`, {
     method: "PUT",

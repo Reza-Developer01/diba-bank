@@ -189,6 +189,8 @@ export default function ContactsPage({
       await deleteContact(id);
 
       setContacts((items) => items.filter((item) => item.id !== id));
+      setModalOpen(false);
+      setEditing(null);
     } catch (error) {
       console.error("DELETE CONTACT ERROR:", error);
     }
