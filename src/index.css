@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "dana";
+  src: url("./assets/fonts/DanaVF.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  font-family: "dana", Tahoma, sans-serif;
+  color: #29251f;
+  background: #f8f7f4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.ss02 {
+  -moz-font-feature-settings: "ss02";
+  -webkit-font-feature-settings: "ss02";
+  font-feature-settings: "ss02";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 1180px;
+  background: #f8f7f4;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8d1c5;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c4b9a9;
+}
+
+::selection {
+  background: #ead9b7;
+  color: #493618;
+}
+
+@media (max-width: 1180px) {
+  body {
+    min-width: 0;
+  }
+}
+
+.field-input {
+  height: 40px;
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #e6e1d9;
+  background: #fff;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  color: #4f4942;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field-input::placeholder {
+  color: #aaa39b;
+}
+
+.field-input:focus {
+  border-color: #b98a39;
+  box-shadow: 0 0 0 3px rgba(185, 138, 57, 0.1);
+}
+
+@media (max-width: 639px) {
+  .field-input {
+    height: 42px;
+  }
+}
