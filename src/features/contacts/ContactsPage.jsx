@@ -126,13 +126,6 @@ export default function ContactsPage({
           .map(normalize)
           .join(" ");
 
-        console.log("FILTER DEBUG:", {
-          selectedCategory: category,
-          activeCategory,
-          categoryDetails,
-          categoryIds: categoryDetails.map((item) => item.id),
-        });
-
         return (
           matchesActiveCategory &&
           matchesCategoryFilter &&

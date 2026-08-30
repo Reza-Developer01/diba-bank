@@ -19,10 +19,16 @@ export async function createContact(data) {
     fullname: data.name,
     email: data.email ?? "",
     address: data.address ?? "",
-    categories: data.categoryId ? [Number(data.categoryId)] : [],
+
+    categories: [
+      ...(data.categoryId ? [Number(data.categoryId)] : []),
+      ...(data.role ? [Number(data.role)] : []),
+    ],
+
     how_met: data.how_met ? Number(data.how_met) : null,
     description: data.description ?? "",
     behavior: data.behavior,
+
     phones: (data.phones ?? [])
       .filter((phone) => phone.number?.trim())
       .map((phone) => ({
@@ -32,6 +38,7 @@ export async function createContact(data) {
       })),
   };
 
+  console.log("CREATE CONTACT DATA:", data);
   console.log("CREATE CONTACT PAYLOAD:", payload);
 
   const response = await fetch(`${API_URL}/contacts/`, {
@@ -61,7 +68,10 @@ export async function updateContact(id, data) {
     email: data.email ?? "",
     address: data.address ?? "",
 
-    categories: data.categoryId ? [Number(data.categoryId)] : [],
+    categories: [
+      ...(data.categoryId ? [Number(data.categoryId)] : []),
+      ...(data.role ? [Number(data.role)] : []),
+    ],
 
     how_met: data.how_met ? Number(data.how_met) : null,
 
