@@ -83,31 +83,34 @@ export default function ContactsPage({
 
     return contacts
       .filter((contact) => {
-        const matchesCategory =
-          !category ||
-          (contact.categories_names ?? []).some(
-            (item) => normalize(item) === normalize(category),
-          );
+        const categoryDetails = Array.isArray(contact.categories_detail)
+          ? contact.categories_detail
+          : [];
+
         const matchesActiveCategory =
-          activeCategory === "all" ||
           !activeCategory ||
-          (contact.categories_names ?? []).some(
-            (item) => normalize(item) === normalize(activeCategory),
+          activeCategory === "all" ||
+          categoryDetails.some(
+            (item) => String(item.id) === String(activeCategory),
           );
+
+        const matchesCategoryFilter =
+          !category ||
+          categoryDetails.some((item) => String(item.id) === String(category));
+
+        const matchesBehavior =
+          !behavior || String(contact.behavior) === String(behavior);
 
         const matchesRole =
-          !role || normalize(contact.role) === normalize(role);
+          !role ||
+          categoryDetails.some((item) => String(item.name) === String(role));
 
-        const matchesBehavior = !behavior || contact.behavior === behavior;
-
-        const categoryNames = (contact.categories_names ?? []).join(" ");
+        const categoryNames = categoryDetails
+          .map((item) => item.name)
+          .join(" ");
 
         const phoneNumbers = (contact.phones ?? [])
           .map((phone) => phone.phone)
-          .join(" ");
-
-        const phoneCategories = (contact.phones ?? [])
-          .map((phone) => phone.category)
           .join(" ");
 
         const haystack = [
@@ -119,14 +122,20 @@ export default function ContactsPage({
           contact.description,
           contact.behavior_display,
           phoneNumbers,
-          phoneCategories,
         ]
           .map(normalize)
           .join(" ");
 
+        console.log("FILTER DEBUG:", {
+          selectedCategory: category,
+          activeCategory,
+          categoryDetails,
+          categoryIds: categoryDetails.map((item) => item.id),
+        });
+
         return (
-          matchesCategory &&
           matchesActiveCategory &&
+          matchesCategoryFilter &&
           matchesRole &&
           matchesBehavior &&
           (!query || haystack.includes(query))
@@ -251,10 +260,12 @@ export default function ContactsPage({
           <Select
             value={category}
             onChange={setCategory}
-            options={categories.map((item) => ({
-              value: item.name,
-              label: item.name,
-            }))}
+            options={categories
+              .filter((item) => item.parent === null)
+              .map((item) => ({
+                value: String(item.id),
+                label: item.name,
+              }))}
             placeholder="همه دسته‌ها"
             className="w-36.25"
           />
