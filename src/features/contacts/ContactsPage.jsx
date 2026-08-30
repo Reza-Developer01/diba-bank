@@ -85,30 +85,21 @@ export default function ContactsPage({
 
     return contacts
       .filter((contact) => {
-        const categoryDetails = Array.isArray(contact.categories_detail)
-          ? contact.categories_detail
-          : [];
-
         const matchesActiveCategory =
           !activeCategory ||
           activeCategory === "all" ||
-          categoryDetails.some(
-            (item) => String(item.id) === String(activeCategory),
-          );
+          String(contact.category) === String(activeCategory);
 
         const matchesCategoryFilter =
-          !category ||
-          categoryDetails.some((item) => String(item.id) === String(category));
+          !category || String(contact.category) === String(category);
 
         const matchesBehavior =
           !behavior || String(contact.behavior) === String(behavior);
 
-        const matchesRole =
-          !role ||
-          categoryDetails.some((item) => String(item.name) === String(role));
+        const matchesRole = !role || String(contact.role) === String(role);
 
-        const categoryNames = categoryDetails
-          .map((item) => item.name)
+        const categoryNames = [contact.category_name, contact.role_name]
+          .filter(Boolean)
           .join(" ");
 
         const phoneNumbers = (contact.phones ?? [])
@@ -176,9 +167,10 @@ export default function ContactsPage({
         const updatedContacts = await getContacts();
         setContacts(updatedContacts);
       } else {
-        const created = await createContact(data);
+        await createContact(data);
 
-        setContacts((items) => [created, ...items]);
+        const updatedContacts = await getContacts();
+        setContacts(updatedContacts);
       }
 
       setModalOpen(false);
@@ -268,7 +260,7 @@ export default function ContactsPage({
             value={role}
             onChange={setRole}
             options={roles.map((item) => ({
-              value: item.name,
+              value: String(item.id),
               label: item.name,
             }))}
             placeholder="همه نقش‌ها"
@@ -524,7 +516,7 @@ export default function ContactsPage({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="whitespace-nowrap text-[10px] text-[#8f887f]">
+              {/* <span className="whitespace-nowrap text-[10px] text-[#8f887f]">
                 نمایش در صفحه
               </span>
 
@@ -542,7 +534,7 @@ export default function ContactsPage({
                 ]}
                 placeholder="تعداد"
                 className="w-22"
-              />
+              /> */}
 
               <div className="flex items-center gap-1">
                 <button

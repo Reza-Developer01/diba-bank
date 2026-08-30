@@ -14,9 +14,9 @@ import { Select } from "../../components/ui";
 
 const emptyForm = {
   name: "",
-  role: "پیمانکار",
+  role: "",
   categoryId: "carpenter",
-  category: "پیمانکار",
+  category: "",
   phones: [
     { id: 1, type: "fixed", number: "" },
     { id: 2, type: "mobile", number: "" },
@@ -121,13 +121,39 @@ export function ContactModal({
     }));
   };
 
+  const validateForm = () => {
+    if (!form.name.trim()) {
+      alert("لطفاً نام و نام خانوادگی را وارد کنید.");
+      return false;
+    }
+
+    if (!form.role) {
+      alert("لطفاً نقش مخاطب را انتخاب کنید.");
+      return false;
+    }
+
+    if (!form.categoryId) {
+      alert("لطفاً دسته‌بندی مخاطب را انتخاب کنید.");
+      return false;
+    }
+
+    if (!form.name_city?.trim()) {
+      alert("لطفاً شهر را وارد کنید.");
+      return false;
+    }
+
+    if (!form.behavior) {
+      alert("لطفاً رفتار قراردادی مخاطب را انتخاب کنید.");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!form.name.trim()) return;
-
-    if (!form.categoryId) {
-      console.log("CATEGORY IS NOT SELECTED");
+    if (!validateForm()) {
       return;
     }
 
