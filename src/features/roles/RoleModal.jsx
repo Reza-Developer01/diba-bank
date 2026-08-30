@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Plus, User, X } from "lucide-react";
 
-export function RoleModal({ open, roles, onClose, onSubmit }) {
+export function RoleModal({ open, roles, categories = [], onClose, onSubmit }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [parentId, setParentId] = useState("");
 
   useEffect(() => {
     if (!open) return;
 
     setName("");
+    setParentId("");
     setError("");
     setSaving(false);
   }, [open]);
@@ -26,8 +28,13 @@ export function RoleModal({ open, roles, onClose, onSubmit }) {
       return;
     }
 
+    if (!parentId) {
+      setError("دسته والد را انتخاب کنید.");
+      return;
+    }
+
     const duplicate = roles.some(
-      (role) => role.trim().toLowerCase() === normalizedName.toLowerCase(),
+      (role) => role.name.trim().toLowerCase() === normalizedName.toLowerCase(),
     );
 
     if (duplicate) {
@@ -39,7 +46,7 @@ export function RoleModal({ open, roles, onClose, onSubmit }) {
     setError("");
 
     try {
-      await onSubmit(normalizedName);
+      await onSubmit(normalizedName, Number(parentId));
       setName("");
     } catch (submitError) {
       setError(submitError?.message || "ثبت نقش با خطا مواجه شد.");
@@ -95,6 +102,32 @@ export function RoleModal({ open, roles, onClose, onSubmit }) {
             />
           </label>
 
+          <label className="mt-4 block">
+            <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
+              دسته والد <b className="text-[#d65d55]">*</b>
+            </span>
+
+            <select
+              value={parentId}
+              onChange={(event) => {
+                setParentId(event.target.value);
+
+                if (error) {
+                  setError("");
+                }
+              }}
+              className="field-input"
+            >
+              <option value="">انتخاب دسته</option>
+
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
           {error && (
             <p className="mt-2 text-[10px] font-medium text-[#c35a52]">
               {error}
@@ -110,10 +143,10 @@ export function RoleModal({ open, roles, onClose, onSubmit }) {
             <div className="flex flex-wrap gap-2">
               {roles.map((role) => (
                 <span
-                  key={role}
+                  key={role.id}
                   className="rounded-md border border-[#eadfcd] bg-white px-2.5 py-1.5 text-[10px] text-[#776c5d]"
                 >
-                  {role}
+                  {role.name}
                 </span>
               ))}
             </div>

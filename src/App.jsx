@@ -7,10 +7,13 @@ import {
 } from "./components/layout";
 import ContactsPage from "./features/contacts/ContactsPage";
 import { RoleModal } from "./features/roles/RoleModal";
-import { createRole, getRoles } from "./services/roles.service";
 import { initialRoles } from "./data/roles";
 import { CategoryModal } from "./features/categories/CategoryModal";
-import { createCategory, getCategories } from "./services/categories.service";
+import {
+  createCategory,
+  createRole,
+  getCategories,
+} from "./services/categories.service";
 
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -19,21 +22,38 @@ export default function App() {
   const [roleModalOpen, setRoleModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoryError, setCategoryError] = useState("");
 
-  const [roles, setRoles] = useState(initialRoles);
+  const roles = categories.filter((category) => category.parent !== null);
+
+  const rootCategories = categories.filter(
+    (category) => category.parent === null,
+  );
 
   useEffect(() => {
-    getRoles().then(setRoles);
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        setCategoryError("");
+
+        const data = await getCategories();
+
+        setCategories(data);
+      } catch (error) {
+        setCategoryError(error?.message || "دریافت دسته‌ها با خطا مواجه شد.");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
   }, []);
 
-  useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
+  const handleCreateRole = async (name, parentId) => {
+    const createdRole = await createRole(name, parentId);
 
-  const handleCreateRole = async (name) => {
-    const createdRole = await createRole(name);
-
-    setRoles((currentRoles) => [...currentRoles, createdRole]);
+    setCategories((currentCategories) => [...currentCategories, createdRole]);
 
     setRoleModalOpen(false);
   };
@@ -68,7 +88,7 @@ export default function App() {
           categories={categories}
         />
         <ContractorSidebar
-          categories={categories}
+          categories={categories.filter((category) => category.parent === null)}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
         />
@@ -81,17 +101,18 @@ export default function App() {
         onCategoryChange={setActiveCategory}
         onAddRole={() => setRoleModalOpen(true)}
         onAddCategory={() => setCategoryModalOpen(true)}
-        categories={categories}
+        categories={categories.filter((category) => category.parent === null)}
       />
       <RoleModal
         open={roleModalOpen}
         roles={roles}
+        categories={rootCategories}
         onClose={() => setRoleModalOpen(false)}
         onSubmit={handleCreateRole}
       />
       <CategoryModal
         open={categoryModalOpen}
-        categories={categories}
+        categories={rootCategories}
         onClose={() => setCategoryModalOpen(false)}
         onSubmit={handleCreateCategory}
       />

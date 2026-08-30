@@ -109,14 +109,16 @@ export function CategoryModal({ open, categories, onClose, onSubmit }) {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <span
-                  key={category.id}
-                  className="rounded-md border border-[#eadfcd] bg-white px-2.5 py-1.5 text-[10px] text-[#776c5d]"
-                >
-                  {category.name}
-                </span>
-              ))}
+              {categories
+                .filter((category) => category.parent === null)
+                .map((category) => (
+                  <span
+                    key={category.id}
+                    className="rounded-md border border-[#eadfcd] bg-white px-2.5 py-1.5 text-[10px] text-[#776c5d]"
+                  >
+                    {category.name}
+                  </span>
+                ))}
             </div>
           </div>
 

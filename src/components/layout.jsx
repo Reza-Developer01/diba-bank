@@ -151,11 +151,11 @@ export function ContractorSidebar({
               type="button"
               className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs"
             >
-              <span>{category.label}</span>
+              <span>{category.name}</span>
 
-              <span className="text-[10px] text-[#a39b91]">
+              {/* <span className="text-[10px] text-[#a39b91]">
                 {category.count}
-              </span>
+              </span> */}
             </button>
           ))}
         </div>

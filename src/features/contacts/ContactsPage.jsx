@@ -181,7 +181,7 @@ export default function ContactsPage({
             value={category}
             onChange={setCategory}
             options={categories
-              .filter((item) => item.id !== "all")
+              .filter((item) => item.parent === null)
               .map((item) => ({
                 value: item.id,
                 label: item.name,
@@ -192,7 +192,10 @@ export default function ContactsPage({
           <Select
             value={role}
             onChange={setRole}
-            options={roles}
+            options={roles.map((item) => ({
+              value: item.name,
+              label: item.name,
+            }))}
             placeholder="همه نقش‌ها"
             className="w-33.75"
           />
