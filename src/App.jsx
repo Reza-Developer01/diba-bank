@@ -12,14 +12,12 @@ import { initialRoles } from "./data/roles";
 import { CategoryModal } from "./features/categories/CategoryModal";
 import { createCategory, getCategories } from "./services/categories.service";
 
-import { initialCategories } from "./data/categories";
-
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [createTrigger, setCreateTrigger] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 
   const [roles, setRoles] = useState(initialRoles);

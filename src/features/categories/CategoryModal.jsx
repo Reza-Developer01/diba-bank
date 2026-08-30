@@ -28,7 +28,7 @@ export function CategoryModal({ open, categories, onClose, onSubmit }) {
 
     const duplicate = categories.some(
       (category) =>
-        category.label.trim().toLowerCase() === normalizedName.toLowerCase(),
+        category.name?.trim().toLowerCase() === normalizedName.toLowerCase(),
     );
 
     if (duplicate) {
@@ -114,7 +114,7 @@ export function CategoryModal({ open, categories, onClose, onSubmit }) {
                   key={category.id}
                   className="rounded-md border border-[#eadfcd] bg-white px-2.5 py-1.5 text-[10px] text-[#776c5d]"
                 >
-                  {category.label}
+                  {category.name}
                 </span>
               ))}
             </div>

@@ -223,7 +223,7 @@ export function MobileDrawer({
                   key={item.id}
                   className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs transition"
                 >
-                  <span>{item.label}</span>
+                  <span>{item.name}</span>
                   <span className="text-[10px] text-[#aaa39a]">
                     {item.count}
                   </span>

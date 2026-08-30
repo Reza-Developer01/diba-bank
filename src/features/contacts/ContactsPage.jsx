@@ -182,7 +182,10 @@ export default function ContactsPage({
             onChange={setCategory}
             options={categories
               .filter((item) => item.id !== "all")
-              .map((item) => ({ value: item.id, label: item.label }))}
+              .map((item) => ({
+                value: item.id,
+                label: item.name,
+              }))}
             placeholder="همه دسته‌ها"
             className="w-36.25"
           />

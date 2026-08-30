@@ -1,40 +1,58 @@
-import { initialCategories } from "../data/categories";
-
-const wait = (ms = 180) => new Promise((resolve) => setTimeout(resolve, ms));
-
-let categories = [...initialCategories];
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function getCategories() {
-  await wait();
+  const response = await fetch(`${API_URL}/categories/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-  return [...categories];
+  const data = await response.json();
+
+  console.log(data);
+
+  if (!response.ok) {
+    throw new Error("دریافت دسته‌ها با خطا مواجه شد.");
+  }
+
+  return data.results;
 }
 
 export async function createCategory(name) {
-  await wait();
-
   const normalizedName = name.trim();
 
   if (!normalizedName) {
     throw new Error("نام دسته الزامی است.");
   }
 
-  const exists = categories.some(
-    (category) =>
-      category.label.trim().toLowerCase() === normalizedName.toLowerCase(),
-  );
+  const response = await fetch(`${API_URL}/categories/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: normalizedName,
+    }),
+  });
 
-  if (exists) {
-    throw new Error("این دسته قبلاً ثبت شده است.");
+  if (!response.ok) {
+    let message = "ثبت دسته با خطا مواجه شد.";
+
+    try {
+      const data = await response.json();
+
+      if (data?.detail) {
+        message = data.detail;
+      } else if (data?.name?.[0]) {
+        message = data.name[0];
+      }
+    } catch {
+      // اگر response قابل parse نبود
+    }
+
+    throw new Error(message);
   }
 
-  const newCategory = {
-    id: `category-${Date.now()}`,
-    label: normalizedName,
-    count: 0,
-  };
-
-  categories = [...categories, newCategory];
-
-  return { ...newCategory };
+  return response.json();
 }
