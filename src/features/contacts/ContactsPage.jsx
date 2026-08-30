@@ -34,7 +34,9 @@ const behaviorMap = {
 function normalize(value) {
   return String(value ?? "")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
 }
 
 export default function ContactsPage({
