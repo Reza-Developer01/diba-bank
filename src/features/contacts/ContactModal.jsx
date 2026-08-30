@@ -96,9 +96,9 @@ export function ContactModal({
     setSaving(false);
   };
 
-  const categoryOptions = categories.map((category) => ({
-    value: category.id,
-    label: category.label,
+  const categoryOptions = categories.map((item) => ({
+    value: item.id,
+    label: item.name,
   }));
 
   return (
@@ -146,8 +146,12 @@ export function ContactModal({
 
             <Field label="دسته‌بندی" required>
               <Select
-                value={form.categoryId}
-                onChange={(value) => update("categoryId", value)}
+                value={categoryOptions.find(
+                  (option) => option.value === form.categoryId,
+                )}
+                onChange={(option) =>
+                  update("categoryId", option?.value ?? null)
+                }
                 options={categoryOptions}
                 placeholder="انتخاب دسته"
               />

@@ -10,8 +10,6 @@ export async function getCategories() {
 
   const data = await response.json();
 
-  console.log(data);
-
   if (!response.ok) {
     throw new Error("دریافت دسته‌ها با خطا مواجه شد.");
   }
