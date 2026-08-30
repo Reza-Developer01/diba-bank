@@ -117,7 +117,7 @@ export default function ContactsPage({
 
         const haystack = [
           contact.fullname,
-          contact.email,
+          contact.website,
           categoryNames,
           contact.how_met_name,
           contact.address,
@@ -414,18 +414,18 @@ export default function ContactsPage({
 
                       {/* WEBSITE */}
                       <td className="px-3 py-4">
-                        {contact.email ? (
+                        {contact.website ? (
                           <div className="flex items-center gap-1.5 whitespace-nowrap text-[10px] text-[#6c665e]">
                             <Globe2 className="size-3.5 text-[#9b948b]" />
 
                             <a
-                              href={contact.email}
+                              href={contact.website}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="max-w-45 truncate hover:text-[#b48634] hover:underline"
-                              title={contact.email}
+                              title={contact.website}
                             >
-                              {contact.email}
+                              {contact.website}
                             </a>
                           </div>
                         ) : (

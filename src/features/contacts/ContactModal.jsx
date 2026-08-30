@@ -21,8 +21,8 @@ const emptyForm = {
     { id: 1, type: "fixed", number: "" },
     { id: 2, type: "mobile", number: "" },
   ],
-  email: "",
-  city: "تهران",
+  website: "",
+  city: "",
   address: "",
   source: "معرفی توسط دوست",
   behavior: "warm",
@@ -71,7 +71,7 @@ export function ContactModal({
 
         role: childCategory ? String(childCategory.id) : "",
 
-        email: contact.email ?? "",
+        website: contact.website ?? "",
 
         address: contact.address ?? "",
 
@@ -80,6 +80,8 @@ export function ContactModal({
         behavior: contact.behavior ?? "warm",
 
         description: contact.description ?? "",
+
+        name_city: contact.name_city ?? "",
 
         phones:
           contact.phones?.length > 0
@@ -265,8 +267,8 @@ export function ContactModal({
               <div className="relative">
                 <Globe2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#a29a90]" />
                 <input
-                  value={form.email}
-                  onChange={(e) => update("email", e.target.value)}
+                  value={form.website}
+                  onChange={(e) => update("website", e.target.value)}
                   placeholder="https://example.com"
                   className="field-input pr-10"
                   dir="ltr"
@@ -278,8 +280,8 @@ export function ContactModal({
               <div className="relative">
                 <MapPin className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#a29a90]" />
                 <input
-                  // value={form.city}
-                  onChange={(e) => update("city", e.target.value)}
+                  value={form.name_city ?? ""}
+                  onChange={(e) => update("name_city", e.target.value)}
                   placeholder="تهران"
                   className="field-input pr-10"
                   style={{ paddingRight: "32px" }}

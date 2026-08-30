@@ -17,8 +17,9 @@ export async function getContacts() {
 export async function createContact(data) {
   const payload = {
     fullname: data.name,
-    email: data.email ?? "",
+    website: data.website ?? "",
     address: data.address ?? "",
+    name_city: data.name_city ?? "",
 
     categories: [
       ...(data.categoryId ? [Number(data.categoryId)] : []),
@@ -37,6 +38,8 @@ export async function createContact(data) {
         phone: phone.number,
       })),
   };
+
+  console.log(payload);
 
   console.log("CREATE CONTACT DATA:", data);
   console.log("CREATE CONTACT PAYLOAD:", payload);
@@ -65,8 +68,9 @@ export async function createContact(data) {
 export async function updateContact(id, data) {
   const payload = {
     fullname: data.name,
-    email: data.email ?? "",
+    website: data.website ?? "",
     address: data.address ?? "",
+    name_city: data.name_city ?? "",
 
     categories: [
       ...(data.categoryId ? [Number(data.categoryId)] : []),
