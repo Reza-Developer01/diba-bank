@@ -10,13 +10,21 @@ export function Badge({ children, tone = "gold" }) {
   };
 
   return (
-    <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-medium ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-medium ${tones[tone]}`}
+    >
       {children}
     </span>
   );
 }
 
-export function Select({ value, onChange, options, placeholder = "انتخاب کنید", className = "" }) {
+export function Select({
+  value,
+  onChange,
+  options,
+  placeholder = "انتخاب کنید",
+  className = "",
+}) {
   return (
     <div className={`relative ${className}`}>
       <select
@@ -36,7 +44,11 @@ export function Select({ value, onChange, options, placeholder = "انتخاب �
   );
 }
 
-export function SearchInput({ value, onChange, placeholder = "جستجو در مخاطبین..." }) {
+export function SearchInput({
+  value,
+  onChange,
+  placeholder = "جستجو در مخاطبین...",
+}) {
   return (
     <div className="relative w-full max-w-127.5">
       <Search className="absolute right-3 top-1/2 size-4.25 -translate-y-1/2 text-[#9b958c]" />

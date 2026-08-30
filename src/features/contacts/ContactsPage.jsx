@@ -10,15 +10,18 @@ import {
   SlidersHorizontal,
   UserRound,
 } from "lucide-react";
+
 import {
   getContacts,
   createContact,
   updateContact,
   deleteContact,
 } from "../../services/contacts.service";
-import { categories, sources } from "../../data/contacts";
+
 import { Badge, SearchInput, Select } from "../../components/ui";
 import { ContactModal } from "./ContactModal";
+import { sources } from "../../data/contacts";
+import { getHowMet } from "../../services/howMet.service";
 
 const DEFAULT_PAGE_SIZE = 8;
 
@@ -38,8 +41,8 @@ export default function ContactsPage({
   onCategoryChange,
   activeCategory,
   createTrigger,
-  roles,
-  categories,
+  roles = [],
+  categories = [],
 }) {
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState("");
@@ -51,6 +54,7 @@ export default function ContactsPage({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [howMetOptions, setHowMetOptions] = useState([]);
 
   useEffect(() => {
     getContacts().then(setContacts);
@@ -61,8 +65,18 @@ export default function ContactsPage({
   }, [search, role, category, behavior, sort, activeCategory]);
 
   useEffect(() => {
-    if (createTrigger > 0) openCreate();
+    if (createTrigger > 0) {
+      openCreate();
+    }
   }, [createTrigger]);
+
+  useEffect(() => {
+    getHowMet()
+      .then(setHowMetOptions)
+      .catch((error) => {
+        console.error("GET HOW MET ERROR:", error);
+      });
+  }, []);
 
   const filtered = useMemo(() => {
     const query = normalize(search);
@@ -70,45 +84,71 @@ export default function ContactsPage({
     return contacts
       .filter((contact) => {
         const matchesCategory =
+          !category ||
+          (contact.categories_names ?? []).some(
+            (item) => normalize(item) === normalize(category),
+          );
+        const matchesActiveCategory =
           activeCategory === "all" ||
           !activeCategory ||
-          contact.categoryId === activeCategory;
-        const matchesRole = !role || contact.role === role;
-        const matchesCategoryFilter =
-          !category || contact.categoryId === category;
+          (contact.categories_names ?? []).some(
+            (item) => normalize(item) === normalize(activeCategory),
+          );
+
+        const matchesRole =
+          !role || normalize(contact.role) === normalize(role);
+
         const matchesBehavior = !behavior || contact.behavior === behavior;
 
+        const categoryNames = (contact.categories_names ?? []).join(" ");
+
+        const phoneNumbers = (contact.phones ?? [])
+          .map((phone) => phone.phone)
+          .join(" ");
+
+        const phoneCategories = (contact.phones ?? [])
+          .map((phone) => phone.category)
+          .join(" ");
+
         const haystack = [
-          contact.name,
-          contact.role,
-          contact.category,
-          contact.city,
+          contact.fullname,
+          contact.email,
+          categoryNames,
+          contact.how_met_name,
           contact.address,
-          contact.website,
           contact.description,
-          ...contact.phones.map((phone) => phone.number),
+          contact.behavior_display,
+          phoneNumbers,
+          phoneCategories,
         ]
           .map(normalize)
           .join(" ");
 
         return (
           matchesCategory &&
+          matchesActiveCategory &&
           matchesRole &&
-          matchesCategoryFilter &&
           matchesBehavior &&
           (!query || haystack.includes(query))
         );
       })
       .sort((a, b) => {
-        if (sort === "name")
-          return `${a.name}`.localeCompare(`${b.name}`, "fa");
-        if (sort === "oldest") return a.id - b.id;
+        if (sort === "name") {
+          return `${a.fullname}`.localeCompare(`${b.fullname}`, "fa");
+        }
+
+        if (sort === "oldest") {
+          return a.id - b.id;
+        }
+
         return b.id - a.id;
       });
   }, [contacts, search, role, category, behavior, sort, activeCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+
   const currentPage = Math.min(page, totalPages);
+
   const pageItems = filtered.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
@@ -125,70 +165,100 @@ export default function ContactsPage({
   };
 
   const handleSubmit = async (data) => {
-    if (editing) {
-      const updated = await updateContact(editing.id, data);
-      setContacts((items) =>
-        items.map((item) => (item.id === editing.id ? updated : item)),
-      );
-    } else {
-      const created = await createContact(data);
-      setContacts((items) => [created, ...items]);
+    try {
+      if (editing) {
+        const updated = await updateContact(editing.id, data);
+
+        setContacts((items) =>
+          items.map((item) => (item.id === editing.id ? updated : item)),
+        );
+      } else {
+        const created = await createContact(data);
+
+        setContacts((items) => [created, ...items]);
+      }
+
+      setModalOpen(false);
+      setEditing(null);
+    } catch (error) {
+      console.error("CONTACT SUBMIT ERROR:", error);
     }
-    setModalOpen(false);
-    setEditing(null);
   };
 
   const handleDelete = async (id) => {
     const ok = window.confirm("آیا از حذف این مخاطب مطمئن هستید؟");
+
     if (!ok) return;
-    await deleteContact(id);
-    setContacts((items) => items.filter((item) => item.id !== id));
+
+    try {
+      await deleteContact(id);
+
+      setContacts((items) => items.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("DELETE CONTACT ERROR:", error);
+    }
   };
 
   return (
     <main className="min-w-0 flex-1 bg-[#f8f7f4]">
       <div className="px-4 py-5 sm:px-7 sm:py-6">
+        {/* HEADER */}
+
         <div className="mb-5 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[19px] font-extrabold text-[#3e3831]">
                 همه مخاطبین
               </h1>
+
               <span className="rounded-full bg-[#eee8dd] px-2 py-0.5 text-[10px] font-semibold text-[#8b7757]">
                 {filtered.length}
               </span>
             </div>
+
             <p className="mt-1 text-[11px] text-[#9b948a]">
               مدیریت و پیگیری ارتباط با مخاطبین و پیمانکاران
             </p>
           </div>
         </div>
 
+        {/* FILTERS */}
+
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <SearchInput value={search} onChange={setSearch} />
+
           <Select
             value={sort}
             onChange={setSort}
             options={[
-              { value: "newest", label: "جدیدترین" },
-              { value: "oldest", label: "قدیمی‌ترین" },
-              { value: "name", label: "بر اساس نام" },
+              {
+                value: "newest",
+                label: "جدیدترین",
+              },
+              {
+                value: "oldest",
+                label: "قدیمی‌ترین",
+              },
+              {
+                value: "name",
+                label: "بر اساس نام",
+              },
             ]}
             placeholder="مرتب‌سازی"
             className="w-33.75"
           />
+
           <Select
             value={category}
             onChange={setCategory}
-            options={categories
-              .filter((item) => item.parent === null)
-              .map((item) => ({
-                value: item.id,
-                label: item.name,
-              }))}
+            options={categories.map((item) => ({
+              value: item.name,
+              label: item.name,
+            }))}
             placeholder="همه دسته‌ها"
             className="w-36.25"
           />
+
           <Select
             value={role}
             onChange={setRole}
@@ -199,17 +269,28 @@ export default function ContactsPage({
             placeholder="همه نقش‌ها"
             className="w-33.75"
           />
+
           <Select
             value={behavior}
             onChange={setBehavior}
             options={[
-              { value: "hot", label: "داغ" },
-              { value: "warm", label: "گرم" },
-              { value: "cold", label: "سرد" },
+              {
+                value: "hot",
+                label: "داغ",
+              },
+              {
+                value: "warm",
+                label: "گرم",
+              },
+              {
+                value: "cold",
+                label: "سرد",
+              },
             ]}
             placeholder="همه وضعیت‌ها"
             className="w-auto"
           />
+
           <button
             className="flex h-10 items-center gap-2 rounded-lg border border-[#e4dfd7] bg-white px-3 text-xs text-[#716a62] hover:bg-[#fbfaf8]"
             onClick={() => {
@@ -220,9 +301,11 @@ export default function ContactsPage({
             }}
           >
             <SlidersHorizontal className="size-4" />
-            باز نشاندن
+            بازنشانی
           </button>
         </div>
+
+        {/* TABLE */}
 
         <div className="overflow-hidden rounded-xl border border-[#e9e5df] bg-white shadow-[0_2px_12px_rgba(55,43,27,0.025)]">
           <div className="overflow-x-auto">
@@ -232,7 +315,7 @@ export default function ContactsPage({
                   <th className="px-4 py-4 text-right">نام و نام خانوادگی</th>
                   <th className="px-3 py-4 text-right">دسته‌بندی</th>
                   <th className="px-3 py-4 text-right">شماره تماس</th>
-                  <th className="px-3 py-4 text-right">شماره اینترنتی</th>
+                  <th className="px-3 py-4 text-right">آدرس اینترنتی</th>
                   <th className="px-3 py-4 text-right">آدرس</th>
                   <th className="px-3 py-4 text-right">نحوه آشنایی</th>
                   <th className="px-3 py-4 text-right">توضیحات</th>
@@ -240,105 +323,164 @@ export default function ContactsPage({
                   <th className="w-12 px-2 py-4"></th>
                 </tr>
               </thead>
+
               <tbody>
                 {pageItems.map((contact) => {
-                  const behaviorInfo = behaviorMap[contact.behavior];
+                  const behaviorInfo = behaviorMap[contact.behavior] || {
+                    label: contact.behavior_display || "—",
+                    tone: "gray",
+                  };
+
+                  const contactCategories = contact.categories_detail ?? [];
+                  const phones = contact.phones ?? [];
+
+                  const howMet = sources.find(
+                    (source) => source.id === Number(contact.how_met),
+                  );
+
                   return (
                     <tr
                       key={contact.id}
                       className="group border-b border-[#f1eee9] last:border-b-0 hover:bg-[#fdfcf9]"
                     >
+                      {/* NAME */}
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2.5">
                           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f4eee4] text-[#8d6a30]">
                             <UserRound className="size-3.75" />
                           </div>
-                          <div>
-                            <div className="text-[11px] font-bold text-[#413b34]">
-                              {contact.name}
-                            </div>
-                            <div className="mt-0.5 text-[9px] text-[#a19a91]">
-                              {contact.role}
+
+                          <div className="min-w-0">
+                            <div className="truncate text-[11px] font-bold text-[#413b34]">
+                              {contact.fullname || "—"}
                             </div>
                           </div>
                         </div>
                       </td>
+
+                      {/* CATEGORY */}
                       <td className="px-3 py-4">
-                        <Badge
-                          tone={
-                            contact.categoryId === "painter"
-                              ? "green"
-                              : contact.categoryId === "designer"
-                                ? "blue"
-                                : "gold"
-                          }
-                        >
-                          {contact.category}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-4">
-                        <div className="flex items-center gap-1.5 whitespace-nowrap text-[10px] text-[#615a52]">
-                          <Phone className="size-3.5 text-[#9b948b]" />
-                          {contact.phones[0]?.number || "-"}
-                          {contact.phones.length > 1 && (
-                            <span className="text-[9px] text-[#aa9f91]">
-                              +{contact.phones.length - 1}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-3 py-4">
-                        {contact.website ? (
-                          <div className="flex items-center gap-1.5 whitespace-nowrap text-[10px] text-[#6c665e]">
-                            <Globe2 className="size-3.5 text-[#9b948b]" />
-                            {contact.website}
+                        {contactCategories.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {contactCategories.map((category) => (
+                              <Badge
+                                key={category.id}
+                                tone={
+                                  category.parent === null ? "gold" : "blue"
+                                }
+                              >
+                                {category.name}
+                              </Badge>
+                            ))}
                           </div>
                         ) : (
                           <span className="text-[10px] text-[#c1bbb3]">—</span>
                         )}
                       </td>
+
+                      {/* PHONES */}
+                      <td className="px-3 py-4">
+                        {phones.length > 0 ? (
+                          <div className="flex flex-col gap-1.5">
+                            {phones.map((phone) => (
+                              <div
+                                key={phone.id}
+                                className="flex items-center gap-1.5 whitespace-nowrap text-[10px] text-[#615a52]"
+                              >
+                                <Phone className="size-3.5 shrink-0 text-[#9b948b]" />
+
+                                <span>{phone.phone || "—"}</span>
+
+                                <span className="text-[9px] text-[#aaa198]">
+                                  {phone.category === "fixed"
+                                    ? "ثابت"
+                                    : phone.category === "mobile"
+                                      ? "همراه"
+                                      : phone.category || ""}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-[#c1bbb3]">—</span>
+                        )}
+                      </td>
+
+                      {/* WEBSITE */}
+                      <td className="px-3 py-4">
+                        {contact.email ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap text-[10px] text-[#6c665e]">
+                            <Globe2 className="size-3.5 text-[#9b948b]" />
+
+                            <a
+                              href={contact.email}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="max-w-45 truncate hover:text-[#b48634] hover:underline"
+                              title={contact.email}
+                            >
+                              {contact.email}
+                            </a>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-[#c1bbb3]">—</span>
+                        )}
+                      </td>
+
+                      {/* ADDRESS */}
                       <td className="max-w-42.5 px-3 py-4">
                         <div className="flex items-center gap-1.5 text-[10px] text-[#686158]">
                           <MapPin className="size-3.5 shrink-0 text-[#a39a90]" />
-                          <span className="truncate">
-                            {contact.city}، {contact.address}
+
+                          <span
+                            className="truncate"
+                            title={contact.address || ""}
+                          >
+                            {contact.address || "—"}
                           </span>
                         </div>
                       </td>
+
+                      {/* HOW MET */}
                       <td className="px-3 py-4 text-[10px] text-[#6e675f]">
-                        {contact.source}
+                        {contact.how_met_name || "—"}
                       </td>
+
+                      {/* DESCRIPTION */}
                       <td className="max-w-42.5 px-3 py-4">
                         <span
                           className="block truncate text-[10px] text-[#827b72]"
-                          title={contact.description}
+                          title={contact.description || ""}
                         >
                           {contact.description || "—"}
                         </span>
                       </td>
+
+                      {/* BEHAVIOR */}
                       <td className="px-3 py-4">
                         <Badge tone={behaviorInfo.tone}>
                           {behaviorInfo.label}
                         </Badge>
                       </td>
+
+                      {/* ACTION */}
                       <td className="px-2 py-4">
-                        <div className="relative">
-                          <button
-                            className="flex size-8 items-center justify-center rounded-lg text-[#a19a91] hover:bg-[#f4f0e9] hover:text-[#6e5124]"
-                            onClick={() => openEdit(contact)}
-                            title="ویرایش"
-                          >
-                            <EllipsisVertical className="size-4" />
-                          </button>
-                        </div>
+                        <button
+                          className="flex size-8 items-center justify-center rounded-lg text-[#a19a91] hover:bg-[#f4f0e9] hover:text-[#6e5124]"
+                          onClick={() => openEdit(contact)}
+                          title="ویرایش"
+                        >
+                          <EllipsisVertical className="size-4" />
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
+
                 {pageItems.length === 0 && (
                   <tr>
                     <td
-                      colSpan="9"
+                      colSpan="8"
                       className="py-20 text-center text-xs text-[#9d968e]"
                     >
                       مخاطبی با این مشخصات پیدا نشد.
@@ -348,6 +490,8 @@ export default function ContactsPage({
               </tbody>
             </table>
           </div>
+
+          {/* PAGINATION */}
 
           <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-t border-[#eeeae4] px-5 py-3">
             <div className="text-[10px] text-[#9b948c]">
@@ -361,6 +505,7 @@ export default function ContactsPage({
               <span className="whitespace-nowrap text-[10px] text-[#8f887f]">
                 نمایش در صفحه
               </span>
+
               <Select
                 value={String(pageSize)}
                 onChange={(value) => {
@@ -426,6 +571,7 @@ export default function ContactsPage({
         onDelete={editing ? () => handleDelete(editing.id) : undefined}
         roles={roles}
         categories={categories}
+        howMetOptions={howMetOptions}
       />
 
       <button

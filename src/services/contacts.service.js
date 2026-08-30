@@ -1,33 +1,113 @@
-import { initialContacts } from "../data/contacts";
-
-const wait = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
-
-let contacts = structuredClone(initialContacts);
+const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = "http://127.0.0.1:8000/api";
 
 export async function getContacts() {
-  await wait();
-  return structuredClone(contacts);
+  const response = await fetch(`${API_URL}/contacts/`);
+
+  if (!response.ok) {
+    throw new Error("دریافت مخاطبین با خطا مواجه شد.");
+  }
+
+  const data = await response.json();
+  console.log(data);
+
+  return data.results ?? [];
 }
 
 export async function createContact(data) {
-  await wait();
-  const newContact = {
-    ...data,
-    id: Date.now(),
+  const payload = {
+    fullname: data.name,
+    email: data.email ?? "",
+    address: data.address ?? "",
+    categories: data.categoryId ? [Number(data.categoryId)] : [],
+    how_met: data.how_met ? Number(data.how_met) : null,
+    description: data.description ?? "",
+    behavior: data.behavior,
+    phones: (data.phones ?? [])
+      .filter((phone) => phone.number?.trim())
+      .map((phone) => ({
+        id: phone.id,
+        category: phone.type,
+        phone: phone.number,
+      })),
   };
-  contacts = [newContact, ...contacts];
-  return structuredClone(newContact);
+
+  console.log("CREATE CONTACT PAYLOAD:", payload);
+
+  const response = await fetch(`${API_URL}/contacts/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    console.error("CREATE CONTACT ERROR:", result);
+
+    throw new Error(
+      result?.detail || result?.message || "ایجاد مخاطب با خطا مواجه شد.",
+    );
+  }
+
+  return result;
 }
 
 export async function updateContact(id, data) {
-  await wait();
-  contacts = contacts.map((contact) =>
-    contact.id === id ? { ...contact, ...data, id } : contact
-  );
-  return structuredClone(contacts.find((contact) => contact.id === id));
+  const payload = {
+    fullname: data.name,
+    email: data.email ?? "",
+    address: data.address ?? "",
+
+    categories: data.categoryId ? [Number(data.categoryId)] : [],
+
+    how_met: data.how_met ? Number(data.how_met) : null,
+
+    description: data.description ?? "",
+    behavior: data.behavior,
+
+    phones: (data.phones ?? [])
+      .filter((phone) => phone.number?.trim())
+      .map((phone) => ({
+        id: phone.id,
+        category: phone.type,
+        phone: phone.number,
+      })),
+  };
+
+  const response = await fetch(`${API_URL}/contacts/${id}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    console.error("UPDATE CONTACT ERROR:", result);
+
+    throw new Error(
+      result?.detail || result?.message || "ویرایش مخاطب با خطا مواجه شد.",
+    );
+  }
+
+  return result;
 }
 
 export async function deleteContact(id) {
-  await wait();
-  contacts = contacts.filter((contact) => contact.id !== id);
+  const response = await fetch(`${API_URL}/contacts/${id}/`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const result = await response.json().catch(() => null);
+
+    throw new Error(
+      result?.detail || result?.message || "حذف مخاطب با خطا مواجه شد.",
+    );
+  }
 }

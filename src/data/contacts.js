@@ -14,11 +14,11 @@ export const categories = [
 export const roles = ["پیمانکار", "مشاور", "تأمین‌کننده", "طراح", "مجری"];
 
 export const sources = [
-  "معرفی توسط دوست",
-  "معرفی توسط همکار",
-  "جستجو در اینترنت",
-  "نمایشگاه",
-  "سایر",
+  { id: 1, name: "معرفی توسط دوست" },
+  { id: 2, name: "معرفی توسط همکار" },
+  { id: 3, name: "جستجو در اینترنت" },
+  { id: 4, name: "نمایشگاه" },
+  { id: 5, name: "سایر" },
 ];
 
 export const initialContacts = [

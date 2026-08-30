@@ -21,7 +21,7 @@ const emptyForm = {
     { id: 1, type: "fixed", number: "" },
     { id: 2, type: "mobile", number: "" },
   ],
-  website: "",
+  email: "",
   city: "تهران",
   address: "",
   source: "معرفی توسط دوست",
@@ -37,6 +37,7 @@ export function ContactModal({
   onDelete,
   roles = [],
   categories = [],
+  howMetOptions,
 }) {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -83,20 +84,37 @@ export function ContactModal({
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!form.name.trim() || !form.categoryId) return;
+
+    if (!form.name.trim()) return;
+
+    if (!form.categoryId) {
+      console.log("CATEGORY IS NOT SELECTED");
+      return;
+    }
 
     setSaving(true);
-    await onSubmit({
-      ...form,
-      category:
-        categories.find((item) => item.id === form.categoryId)?.label ||
-        form.category,
-      phones: form.phones.filter((phone) => phone.number.trim()),
-    });
-    setSaving(false);
+
+    try {
+      await onSubmit({
+        ...form,
+        category:
+          categories.find((item) => String(item.id) === String(form.categoryId))
+            ?.name || form.category,
+        phones: form.phones.filter((phone) => phone.number.trim()),
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const categoryOptions = categories.map((item) => ({
+  const categoryOptions = categories
+    .filter((item) => item.parent === null)
+    .map((item) => ({
+      value: item.id,
+      label: item.name,
+    }));
+
+  const roleOptions = roles.map((item) => ({
     value: item.id,
     label: item.name,
   }));
@@ -137,21 +155,17 @@ export function ContactModal({
 
             <Field label="نقش" required>
               <Select
-                value={form.role}
+                value={form.role ?? ""}
                 onChange={(value) => update("role", value)}
-                options={roles}
+                options={roleOptions}
                 placeholder="انتخاب نقش"
               />
             </Field>
 
             <Field label="دسته‌بندی" required>
               <Select
-                value={categoryOptions.find(
-                  (option) => option.value === form.categoryId,
-                )}
-                onChange={(option) =>
-                  update("categoryId", option?.value ?? null)
-                }
+                value={form.categoryId ?? ""}
+                onChange={(value) => update("categoryId", value)}
                 options={categoryOptions}
                 placeholder="انتخاب دسته"
               />
@@ -211,8 +225,8 @@ export function ContactModal({
               <div className="relative">
                 <Globe2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#a29a90]" />
                 <input
-                  value={form.website}
-                  onChange={(e) => update("website", e.target.value)}
+                  value={form.email}
+                  onChange={(e) => update("email", e.target.value)}
                   placeholder="https://example.com"
                   className="field-input pr-10"
                   dir="ltr"
@@ -250,10 +264,13 @@ export function ContactModal({
           <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="نحوه آشنایی">
               <Select
-                value={form.source}
-                onChange={(value) => update("source", value)}
-                options={sources}
-                placeholder="انتخاب کنید"
+                value={form.how_met ?? ""}
+                onChange={(value) => update("how_met", value)}
+                options={howMetOptions.map((item) => ({
+                  value: String(item.id),
+                  label: item.name,
+                }))}
+                placeholder="نحوه آشنایی"
               />
             </Field>
 
