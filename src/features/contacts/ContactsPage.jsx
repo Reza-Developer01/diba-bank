@@ -262,7 +262,7 @@ export default function ContactsPage({
                 label: item.name,
               }))}
             placeholder="همه دسته‌ها"
-            className="w-36.25"
+            className="w-auto"
           />
 
           <Select
@@ -273,7 +273,7 @@ export default function ContactsPage({
               label: item.name,
             }))}
             placeholder="همه نقش‌ها"
-            className="w-33.75"
+            className="w-auto"
           />
 
           <Select

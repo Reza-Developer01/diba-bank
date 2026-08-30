@@ -44,16 +44,56 @@ export function ContactModal({
 
   useEffect(() => {
     if (!open) return;
+
     if (contact) {
+      const categoryDetails = contact.categories_detail ?? [];
+
+      const parentCategory = categoryDetails.find(
+        (item) => item.parent === null,
+      );
+
+      const childCategory = categoryDetails.find(
+        (item) => item.parent !== null,
+      );
+
+      const howMet = howMetOptions.find(
+        (item) => item.name === contact.how_met_name,
+      );
+
       setForm({
         ...emptyForm,
-        ...contact,
-        phones: contact.phones?.length ? contact.phones : emptyForm.phones,
+
+        name: contact.fullname ?? "",
+
+        categoryId: parentCategory ? String(parentCategory.id) : "",
+
+        category: parentCategory?.name ?? "",
+
+        role: childCategory ? String(childCategory.id) : "",
+
+        email: contact.email ?? "",
+
+        address: contact.address ?? "",
+
+        how_met: howMet ? String(howMet.id) : "",
+
+        behavior: contact.behavior ?? "warm",
+
+        description: contact.description ?? "",
+
+        phones:
+          contact.phones?.length > 0
+            ? contact.phones.map((phone) => ({
+                id: phone.id,
+                type: phone.category,
+                number: phone.phone,
+              }))
+            : emptyForm.phones,
       });
     } else {
       setForm(emptyForm);
     }
-  }, [open, contact]);
+  }, [open, contact, howMetOptions]);
 
   if (!open) return null;
 
