@@ -25,6 +25,7 @@ const emptyForm = {
   city: "",
   address: "",
   source: "معرفی توسط دوست",
+  how_met: "",
   behavior: "warm",
   description: "",
 };
@@ -46,18 +47,10 @@ export function ContactModal({
     if (!open) return;
 
     if (contact) {
-      const categoryDetails = contact.categories_detail ?? [];
-
-      const parentCategory = categoryDetails.find(
-        (item) => item.parent === null,
-      );
-
-      const childCategory = categoryDetails.find(
-        (item) => item.parent !== null,
-      );
-
-      const howMet = howMetOptions.find(
-        (item) => item.name === contact.how_met_name,
+      const matchedHowMet = howMetOptions?.find(
+        (item) =>
+          String(item.name).trim() ===
+          String(contact.how_met_name ?? "").trim(),
       );
 
       setForm({
@@ -65,35 +58,39 @@ export function ContactModal({
 
         name: contact.fullname ?? "",
 
-        categoryId: parentCategory ? String(parentCategory.id) : "",
-
-        category: parentCategory?.name ?? "",
-
-        role: childCategory ? String(childCategory.id) : "",
-
         website: contact.website ?? "",
 
         address: contact.address ?? "",
 
-        how_met: howMet ? String(howMet.id) : "",
+        name_city: contact.name_city ?? "",
+
+        categoryId: contact.category ? String(contact.category) : "",
+
+        role: contact.role ? String(contact.role) : "",
+
+        category: contact.category_name ?? "",
+
+        how_met: matchedHowMet ? String(matchedHowMet.id) : "",
 
         behavior: contact.behavior ?? "warm",
 
         description: contact.description ?? "",
 
-        name_city: contact.name_city ?? "",
-
-        phones:
-          contact.phones?.length > 0
-            ? contact.phones.map((phone) => ({
-                id: phone.id,
-                type: phone.category,
-                number: phone.phone,
-              }))
-            : emptyForm.phones,
+        phones: contact.phones?.length
+          ? contact.phones.map((phone) => ({
+              id: phone.id,
+              type: phone.category,
+              number: phone.phone,
+            }))
+          : emptyForm.phones,
       });
     } else {
-      setForm(emptyForm);
+      setForm({
+        ...emptyForm,
+        phones: emptyForm.phones.map((phone) => ({
+          ...phone,
+        })),
+      });
     }
   }, [open, contact, howMetOptions]);
 

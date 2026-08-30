@@ -21,10 +21,8 @@ export async function createContact(data) {
     address: data.address ?? "",
     name_city: data.name_city ?? "",
 
-    categories: [
-      ...(data.categoryId ? [Number(data.categoryId)] : []),
-      ...(data.role ? [Number(data.role)] : []),
-    ],
+    category: data.categoryId ? Number(data.categoryId) : null,
+    role: data.role ? Number(data.role) : null,
 
     how_met: data.how_met ? Number(data.how_met) : null,
     description: data.description ?? "",
@@ -72,10 +70,8 @@ export async function updateContact(id, data) {
     address: data.address ?? "",
     name_city: data.name_city ?? "",
 
-    categories: [
-      ...(data.categoryId ? [Number(data.categoryId)] : []),
-      ...(data.role ? [Number(data.role)] : []),
-    ],
+    category: data.categoryId ? Number(data.categoryId) : null,
+    role: data.role ? Number(data.role) : null,
 
     how_met: data.how_met ? Number(data.how_met) : null,
 
@@ -90,6 +86,8 @@ export async function updateContact(id, data) {
         phone: phone.number,
       })),
   };
+
+  console.log(payload);
 
   const response = await fetch(`${API_URL}/contacts/${id}/`, {
     method: "PUT",

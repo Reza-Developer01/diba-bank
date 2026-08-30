@@ -337,11 +337,28 @@ export default function ContactsPage({
                     tone: "gray",
                   };
 
-                  const contactCategories = contact.categories_detail ?? [];
+                  const contactCategories = [];
+
+                  if (contact.category) {
+                    contactCategories.push({
+                      id: contact.category,
+                      name: contact.category_name,
+                      parent: null,
+                    });
+                  }
+
+                  if (contact.role) {
+                    contactCategories.push({
+                      id: contact.role,
+                      name: contact.role_name,
+                      parent: contact.category,
+                    });
+                  }
+
                   const phones = contact.phones ?? [];
 
                   const howMet = sources.find(
-                    (source) => source.id === Number(contact.how_met),
+                    (source) => source.id === Number(contact.how_met_name),
                   );
 
                   return (
