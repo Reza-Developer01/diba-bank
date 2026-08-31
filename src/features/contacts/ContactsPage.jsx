@@ -21,7 +21,7 @@ import {
 import { Badge, SearchInput, Select } from "../../components/ui";
 import { ContactModal } from "./ContactModal";
 import { sources } from "../../data/contacts";
-import { getHowMet } from "../../services/howMet.service";
+// import { getHowMet } from "../../services/howMet.service";
 
 const DEFAULT_PAGE_SIZE = 8;
 
@@ -45,6 +45,7 @@ export default function ContactsPage({
   createTrigger,
   roles = [],
   categories = [],
+  howMetOptions,
 }) {
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState("");
@@ -56,7 +57,7 @@ export default function ContactsPage({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [howMetOptions, setHowMetOptions] = useState([]);
+  // const [howMetOptions, setHowMetOptions] = useState([]);
 
   useEffect(() => {
     getContacts().then(setContacts);
@@ -72,13 +73,13 @@ export default function ContactsPage({
     }
   }, [createTrigger]);
 
-  useEffect(() => {
-    getHowMet()
-      .then(setHowMetOptions)
-      .catch((error) => {
-        console.error("GET HOW MET ERROR:", error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   getHowMet()
+  //     .then(setHowMetOptions)
+  //     .catch((error) => {
+  //       console.error("GET HOW MET ERROR:", error);
+  //     });
+  // }, []);
 
   const filtered = useMemo(() => {
     const query = normalize(search);

@@ -8,7 +8,7 @@ import {
   deleteHowMet,
 } from "../../services/howMet.service";
 
-export function HowMetModal({ open, onClose }) {
+export function HowMetModal({ open, onClose, onHowMetChange }) {
   const [items, setItems] = useState([]);
   const [name, setName] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -60,6 +60,11 @@ export function HowMetModal({ open, onClose }) {
       }
 
       await loadHowMet();
+
+      if (onHowMetChange) {
+        await onHowMetChange();
+      }
+
       resetForm();
     } catch (error) {
       console.error("HOW MET SAVE ERROR:", error);
@@ -87,6 +92,10 @@ export function HowMetModal({ open, onClose }) {
       await deleteHowMet(id);
 
       setItems((current) => current.filter((item) => item.id !== id));
+
+      if (onHowMetChange) {
+        await onHowMetChange();
+      }
 
       if (editingId === id) {
         resetForm();

@@ -15,6 +15,7 @@ import {
   getCategories,
 } from "./services/categories.service";
 import { HowMetModal } from "./features/contacts/HowMetModal";
+import { getHowMet } from "./services/howMet.service";
 
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -26,6 +27,7 @@ export default function App() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState("");
   const [howMetModalOpen, setHowMetModalOpen] = useState(false);
+  const [howMetOptions, setHowMetOptions] = useState([]);
 
   const roles = categories.filter((category) => category.parent !== null);
 
@@ -52,6 +54,10 @@ export default function App() {
     loadCategories();
   }, []);
 
+  useEffect(() => {
+    loadHowMetOptions();
+  }, []);
+
   const handleCreateRole = async (name, parentId) => {
     const createdRole = await createRole(name, parentId);
 
@@ -69,6 +75,15 @@ export default function App() {
     ]);
 
     setCategoryModalOpen(false);
+  };
+
+  const loadHowMetOptions = async () => {
+    try {
+      const data = await getHowMet();
+      setHowMetOptions(data);
+    } catch (error) {
+      console.error("GET HOW MET ERROR:", error);
+    }
   };
 
   return (
@@ -89,6 +104,7 @@ export default function App() {
           createTrigger={createTrigger}
           roles={roles}
           categories={categories}
+          howMetOptions={howMetOptions}
         />
         <ContractorSidebar
           categories={categories.filter((category) => category.parent === null)}
@@ -123,6 +139,7 @@ export default function App() {
       <HowMetModal
         open={howMetModalOpen}
         onClose={() => setHowMetModalOpen(false)}
+        onHowMetChange={loadHowMetOptions}
       />
     </div>
   );
