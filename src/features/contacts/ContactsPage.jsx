@@ -46,6 +46,7 @@ export default function ContactsPage({
   roles = [],
   categories = [],
   howMetOptions,
+  onContactsChange,
 }) {
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState("");
@@ -60,8 +61,11 @@ export default function ContactsPage({
   // const [howMetOptions, setHowMetOptions] = useState([]);
 
   useEffect(() => {
-    getContacts().then(setContacts);
-  }, []);
+    getContacts().then((data) => {
+      setContacts(data);
+      onContactsChange?.(data);
+    });
+  }, [onContactsChange]);
 
   useEffect(() => {
     setPage(1);
@@ -166,12 +170,16 @@ export default function ContactsPage({
         await updateContact(editing.id, data);
 
         const updatedContacts = await getContacts();
+
         setContacts(updatedContacts);
+        onContactsChange?.(updatedContacts);
       } else {
         await createContact(data);
 
         const updatedContacts = await getContacts();
+
         setContacts(updatedContacts);
+        onContactsChange?.(updatedContacts);
       }
 
       setModalOpen(false);
@@ -189,7 +197,14 @@ export default function ContactsPage({
     try {
       await deleteContact(id);
 
-      setContacts((items) => items.filter((item) => item.id !== id));
+      setContacts((items) => {
+        const updatedContacts = items.filter((item) => item.id !== id);
+
+        onContactsChange?.(updatedContacts);
+
+        return updatedContacts;
+      });
+
       setModalOpen(false);
       setEditing(null);
     } catch (error) {

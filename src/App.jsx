@@ -32,6 +32,7 @@ export default function App() {
   const [categoryError, setCategoryError] = useState("");
   const [howMetModalOpen, setHowMetModalOpen] = useState(false);
   const [howMetOptions, setHowMetOptions] = useState([]);
+  const [contacts, setContacts] = useState([]);
 
   const roles = categories.filter((category) => category.parent !== null);
 
@@ -154,10 +155,12 @@ export default function App() {
           roles={roles}
           categories={categories}
           howMetOptions={howMetOptions}
+          onContactsChange={setContacts}
         />
         <ContractorSidebar
           categories={categories.filter((category) => category.parent === null)}
           allCategories={categories}
+          contacts={contacts}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
         />
@@ -170,6 +173,7 @@ export default function App() {
         onCategoryChange={setActiveCategory}
         onAddRole={() => setRoleModalOpen(true)}
         onAddCategory={() => setCategoryModalOpen(true)}
+        onHowMet={() => setHowMetModalOpen(true)}
         categories={categories.filter((category) => category.parent === null)}
         allCategories={categories}
       />

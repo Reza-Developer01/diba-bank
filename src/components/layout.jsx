@@ -138,6 +138,7 @@ export function MainSidebar({
 export function ContractorSidebar({
   categories = [],
   allCategories = [],
+  contacts = [],
   activeCategory,
   onCategoryChange,
 }) {
@@ -176,13 +177,19 @@ export function ContractorSidebar({
                 >
                   <span className="text-[#5f574f]">{category.name}</span>
 
-                  <span
-                    className={`text-[10px] text-[#aaa39a] transition-transform duration-200 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  >
-                    <ChevronDown className="w-4 h-4" />
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-5 rounded-full bg-[#f3eee6] px-1.5 py-0.5 text-center text-[9px] font-semibold text-[#9a7946]">
+                      {categoryRoles.length}
+                    </span>
+
+                    <span
+                      className={`text-[#aaa39a] transition-transform duration-200 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </span>
+                  </div>
                 </button>
 
                 <div
@@ -195,14 +202,25 @@ export function ContractorSidebar({
                   <div className="overflow-hidden">
                     <div className="mr-3 mt-1 space-y-1 border-r border-[#eee7df] pr-3">
                       {categoryRoles.length > 0 ? (
-                        categoryRoles.map((role) => (
-                          <div
-                            key={role.id}
-                            className="rounded-lg px-3 py-2.5 text-xs text-[#716a61] transition hover:bg-[#faf8f4]"
-                          >
-                            {role.name}
-                          </div>
-                        ))
+                        categoryRoles.map((role) => {
+                          const roleContactsCount = contacts.filter(
+                            (contact) =>
+                              String(contact.role) === String(role.id),
+                          ).length;
+
+                          return (
+                            <div
+                              key={role.id}
+                              className="flex items-center justify-between rounded-lg px-3 py-2.5 text-xs text-[#716a61] transition hover:bg-[#faf8f4]"
+                            >
+                              <span>{role.name}</span>
+
+                              <span className="min-w-5 rounded-full bg-[#f3eee6] px-1.5 py-0.5 text-center text-[9px] font-semibold text-[#9a7946]">
+                                {roleContactsCount}
+                              </span>
+                            </div>
+                          );
+                        })
                       ) : (
                         <div className="px-3 py-2.5 text-[10px] text-[#aaa39a]">
                           نقشی برای این دسته ثبت نشده
@@ -393,13 +411,19 @@ function MobileContractorCategories({ categories = [], allCategories = [] }) {
             >
               <span className="text-[#5f574f]">{category.name}</span>
 
-              <span
-                className={`text-[10px] text-[#aaa39a] transition-transform duration-200 ${
-                  isOpen ? "rotate-180" : ""
-                }`}
-              >
-                <ChevronDown className="w-4 h-4" />
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="min-w-5 rounded-full bg-[#f3eee6] px-1.5 py-0.5 text-center text-[9px] font-semibold text-[#9a7946]">
+                  {categoryRoles.length}
+                </span>
+
+                <span
+                  className={`text-[#aaa39a] transition-transform duration-200 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </span>
+              </div>
             </button>
 
             <div
