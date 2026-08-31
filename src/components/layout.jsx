@@ -85,6 +85,7 @@ export function MainSidebar({
   onCategoryChange,
   onAddRole,
   onAddCategory,
+  onHowMet,
 }) {
   const items = [
     { icon: Users, label: "همه مخاطبین", active: true },
@@ -111,7 +112,9 @@ export function MainSidebar({
                   ? onAddCategory
                   : label === "افزودن نقش"
                     ? onAddRole
-                    : undefined
+                    : label === "نحوه آشنایی"
+                      ? onHowMet
+                      : undefined
               }
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-xs transition ${
                 active
@@ -258,16 +261,12 @@ function MobileMenuItems({
           key={label}
           onClick={
             label === "افزودن دسته"
-              ? () => {
-                  onAddCategory();
-                  onClose();
-                }
+              ? onAddCategory
               : label === "افزودن نقش"
-                ? () => {
-                    onAddRole();
-                    onClose();
-                  }
-                : undefined
+                ? onAddRole
+                : label === "نحوه آشنایی"
+                  ? onHowMet
+                  : undefined
           }
           className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-xs ${
             index === 0

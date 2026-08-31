@@ -14,6 +14,7 @@ import {
   createRole,
   getCategories,
 } from "./services/categories.service";
+import { HowMetModal } from "./features/contacts/HowMetModal";
 
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -24,6 +25,7 @@ export default function App() {
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState("");
+  const [howMetModalOpen, setHowMetModalOpen] = useState(false);
 
   const roles = categories.filter((category) => category.parent !== null);
 
@@ -79,6 +81,7 @@ export default function App() {
         <MainSidebar
           onAddRole={() => setRoleModalOpen(true)}
           onAddCategory={() => setCategoryModalOpen(true)}
+          onHowMet={() => setHowMetModalOpen(true)}
         />
         <ContactsPage
           activeCategory={activeCategory}
@@ -115,6 +118,11 @@ export default function App() {
         categories={rootCategories}
         onClose={() => setCategoryModalOpen(false)}
         onSubmit={handleCreateCategory}
+      />
+
+      <HowMetModal
+        open={howMetModalOpen}
+        onClose={() => setHowMetModalOpen(false)}
       />
     </div>
   );
