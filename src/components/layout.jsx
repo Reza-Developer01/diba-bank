@@ -175,6 +175,7 @@ export function MobileDrawer({
   categories = [],
   onAddRole,
   onAddCategory,
+  onHowMet,
 }) {
   if (!open) return null;
 
@@ -209,6 +210,7 @@ export function MobileDrawer({
           <MobileMenuItems
             onAddRole={onAddRole}
             onAddCategory={onAddCategory}
+            onHowMet={onHowMet}
             onClose={onClose}
             categories={categories}
           />
@@ -245,6 +247,7 @@ function MobileMenuItems({
   onAddCategory,
   onClose,
   categories = [],
+  onHowMet,
 }) {
   const items = [
     [Users, "همه مخاطبین"],

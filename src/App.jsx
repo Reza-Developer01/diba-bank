@@ -159,6 +159,7 @@ export default function App() {
         {/* <LeftRail /> */}
       </div>
       <MobileDrawer
+        onHowMet={() => setHowMetModalOpen(true)}
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         activeCategory={activeCategory}

@@ -71,6 +71,7 @@ export default function LoginPage() {
                 placeholder="نام کاربری خود را وارد کنید"
                 className="field-input pr-10"
                 autoComplete="username"
+                style={{ paddingRight: "32px" }}
               />
             </div>
           </label>
@@ -93,6 +94,7 @@ export default function LoginPage() {
                 placeholder="رمز عبور خود را وارد کنید"
                 className="field-input pr-10"
                 autoComplete="current-password"
+                style={{ paddingRight: "32px" }}
               />
             </div>
           </label>
