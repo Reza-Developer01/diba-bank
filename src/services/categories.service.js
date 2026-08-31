@@ -81,7 +81,7 @@ export async function createRole(name, parentId) {
     },
     body: JSON.stringify({
       name: normalizedName,
-      parent: parentId,
+      parent: Number(parentId),
     }),
   });
 
@@ -108,4 +108,65 @@ export async function createRole(name, parentId) {
   }
 
   return data;
+}
+
+export async function updateRole(id, name, parentId) {
+  const normalizedName = name.trim();
+
+  if (!normalizedName) {
+    throw new Error("نام نقش الزامی است.");
+  }
+
+  if (!parentId) {
+    throw new Error("دسته والد نقش را انتخاب کنید.");
+  }
+
+  const response = await fetch(`${API_URL}/categories/${id}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: normalizedName,
+      parent: Number(parentId),
+    }),
+  });
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("پاسخ سرور معتبر نیست.");
+  }
+
+  if (!response.ok) {
+    let message = "ویرایش نقش با خطا مواجه شد.";
+
+    if (data?.detail) {
+      message = data.detail;
+    } else if (data?.name?.[0]) {
+      message = data.name[0];
+    } else if (data?.parent?.[0]) {
+      message = data.parent[0];
+    }
+
+    throw new Error(message);
+  }
+
+  return data;
+}
+
+export async function deleteRole(id) {
+  const response = await fetch(`${API_URL}/categories/${id}/`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(
+      data?.detail || data?.message || "حذف نقش با خطا مواجه شد.",
+    );
+  }
 }

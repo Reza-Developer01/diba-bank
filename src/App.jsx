@@ -13,6 +13,8 @@ import {
   createCategory,
   createRole,
   getCategories,
+  updateRole,
+  deleteRole,
 } from "./services/categories.service";
 import { HowMetModal } from "./features/contacts/HowMetModal";
 import { getHowMet } from "./services/howMet.service";
@@ -64,6 +66,24 @@ export default function App() {
     setCategories((currentCategories) => [...currentCategories, createdRole]);
 
     setRoleModalOpen(false);
+  };
+
+  const handleUpdateRole = async (id, name, parentId) => {
+    const updatedRole = await updateRole(id, name, parentId);
+
+    setCategories((currentCategories) =>
+      currentCategories.map((category) =>
+        category.id === id ? updatedRole : category,
+      ),
+    );
+  };
+
+  const handleDeleteRole = async (id) => {
+    await deleteRole(id);
+
+    setCategories((currentCategories) =>
+      currentCategories.filter((category) => category.id !== id),
+    );
   };
 
   const handleCreateCategory = async (name) => {
@@ -128,6 +148,8 @@ export default function App() {
         categories={rootCategories}
         onClose={() => setRoleModalOpen(false)}
         onSubmit={handleCreateRole}
+        onUpdate={handleUpdateRole}
+        onDelete={handleDeleteRole}
       />
       <CategoryModal
         open={categoryModalOpen}
