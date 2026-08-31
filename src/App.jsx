@@ -13,6 +13,8 @@ import {
   createCategory,
   createRole,
   getCategories,
+  updateCategory,
+  deleteCategory,
   updateRole,
   deleteRole,
 } from "./services/categories.service";
@@ -97,6 +99,29 @@ export default function App() {
     setCategoryModalOpen(false);
   };
 
+  const handleEditCategory = async (id, name) => {
+    const updatedCategory = await updateCategory(id, name);
+
+    setCategories((currentCategories) =>
+      currentCategories.map((category) =>
+        category.id === id ? updatedCategory : category,
+      ),
+    );
+  };
+
+  const handleDeleteCategory = async (id) => {
+    await deleteCategory(id);
+
+    setCategories((currentCategories) =>
+      currentCategories.filter((category) => category.id !== id),
+    );
+
+    // اگر دسته حذف‌شده دسته فعال بوده، برگرد به همه مخاطبین
+    if (String(activeCategory) === String(id)) {
+      setActiveCategory("all");
+    }
+  };
+
   const loadHowMetOptions = async () => {
     try {
       const data = await getHowMet();
@@ -153,9 +178,11 @@ export default function App() {
       />
       <CategoryModal
         open={categoryModalOpen}
-        categories={rootCategories}
+        categories={categories}
         onClose={() => setCategoryModalOpen(false)}
         onSubmit={handleCreateCategory}
+        onEdit={handleEditCategory}
+        onDelete={handleDeleteCategory}
       />
 
       <HowMetModal

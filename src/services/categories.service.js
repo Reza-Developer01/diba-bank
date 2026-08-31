@@ -63,6 +63,60 @@ export async function createCategory(name) {
   return data;
 }
 
+export async function updateCategory(id, name) {
+  const normalizedName = name.trim();
+
+  if (!normalizedName) {
+    throw new Error("نام دسته الزامی است.");
+  }
+
+  const response = await fetch(`${API_URL}/categories/${id}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: normalizedName,
+    }),
+  });
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("پاسخ سرور معتبر نیست.");
+  }
+
+  if (!response.ok) {
+    let message = "ویرایش دسته با خطا مواجه شد.";
+
+    if (data?.detail) {
+      message = data.detail;
+    } else if (data?.name?.[0]) {
+      message = data.name[0];
+    }
+
+    throw new Error(message);
+  }
+
+  return data;
+}
+
+export async function deleteCategory(id) {
+  const response = await fetch(`${API_URL}/categories/${id}/`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(
+      data?.detail || data?.message || "حذف دسته با خطا مواجه شد.",
+    );
+  }
+}
+
 export async function createRole(name, parentId) {
   const normalizedName = name.trim();
 
