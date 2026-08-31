@@ -13,6 +13,7 @@ import {
   UserCog,
   Users,
   Wrench,
+  ChevronDown,
 } from "lucide-react";
 import { categories } from "../data/contacts";
 import { IconButton } from "./ui";
@@ -136,9 +137,18 @@ export function MainSidebar({
 
 export function ContractorSidebar({
   categories = [],
+  allCategories = [],
   activeCategory,
   onCategoryChange,
 }) {
+  const [openCategory, setOpenCategory] = React.useState(null);
+
+  const toggleCategory = (categoryId) => {
+    setOpenCategory((current) =>
+      String(current) === String(categoryId) ? null : categoryId,
+    );
+  };
+
   return (
     <aside className="hidden w-58.75 shrink-0 border-r border-[#ebe7e0] bg-white xl:block">
       <div className="sticky top-0 px-5 py-5">
@@ -148,19 +158,62 @@ export function ContractorSidebar({
         </div>
 
         <div className="space-y-1">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs"
-            >
-              <span>{category.name}</span>
+          {categories.map((category) => {
+            const categoryRoles = allCategories.filter(
+              (item) =>
+                item.is_role === true &&
+                String(item.parent) === String(category.id),
+            );
 
-              {/* <span className="text-[10px] text-[#a39b91]">
-                {category.count}
-              </span> */}
-            </button>
-          ))}
+            const isOpen = String(openCategory) === String(category.id);
+
+            return (
+              <div key={category.id}>
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(category.id)}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs transition hover:bg-[#faf8f4]"
+                >
+                  <span className="text-[#5f574f]">{category.name}</span>
+
+                  <span
+                    className={`text-[10px] text-[#aaa39a] transition-transform duration-200 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </span>
+                </button>
+
+                <div
+                  className={`grid transition-all duration-200 ease-in-out ${
+                    isOpen
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <div className="mr-3 mt-1 space-y-1 border-r border-[#eee7df] pr-3">
+                      {categoryRoles.length > 0 ? (
+                        categoryRoles.map((role) => (
+                          <div
+                            key={role.id}
+                            className="rounded-lg px-3 py-2.5 text-xs text-[#716a61] transition hover:bg-[#faf8f4]"
+                          >
+                            {role.name}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2.5 text-[10px] text-[#aaa39a]">
+                          نقشی برای این دسته ثبت نشده
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </aside>
@@ -173,6 +226,7 @@ export function MobileDrawer({
   activeCategory,
   onCategoryChange,
   categories = [],
+  allCategories = [],
   onAddRole,
   onAddCategory,
   onHowMet,
@@ -221,21 +275,11 @@ export function MobileDrawer({
             <Users className="size-4.25 text-[#b48634]" />
             پیمانکاران
           </div>
-          <div className="space-y-1">
-            {categories.map((item) => {
-              return (
-                <button
-                  key={item.id}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs transition"
-                >
-                  <span>{item.name}</span>
-                  <span className="text-[10px] text-[#aaa39a]">
-                    {item.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+
+          <MobileContractorCategories
+            categories={categories}
+            allCategories={allCategories}
+          />
         </div>
       </aside>
     </div>
@@ -316,6 +360,77 @@ export function LeftRail() {
       <button className="flex size-11 items-center justify-center rounded-xl text-[#a09a92] hover:bg-[#f4f1eb]">
         <CircleHelp className="size-4.25" />
       </button>
+    </div>
+  );
+}
+
+function MobileContractorCategories({ categories = [], allCategories = [] }) {
+  const [openCategory, setOpenCategory] = React.useState(null);
+
+  const toggleCategory = (categoryId) => {
+    setOpenCategory((current) =>
+      String(current) === String(categoryId) ? null : categoryId,
+    );
+  };
+
+  return (
+    <div className="space-y-1">
+      {categories.map((category) => {
+        const categoryRoles = allCategories.filter(
+          (item) =>
+            item.is_role === true &&
+            String(item.parent) === String(category.id),
+        );
+
+        const isOpen = String(openCategory) === String(category.id);
+
+        return (
+          <div key={category.id}>
+            <button
+              type="button"
+              onClick={() => toggleCategory(category.id)}
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs transition hover:bg-[#faf8f4]"
+            >
+              <span className="text-[#5f574f]">{category.name}</span>
+
+              <span
+                className={`text-[10px] text-[#aaa39a] transition-transform duration-200 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              >
+                <ChevronDown className="w-4 h-4" />
+              </span>
+            </button>
+
+            <div
+              className={`grid transition-all duration-200 ease-in-out ${
+                isOpen
+                  ? "grid-rows-[1fr] opacity-100"
+                  : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="mr-3 mt-1 space-y-1 border-r border-[#eee7df] pr-3">
+                  {categoryRoles.length > 0 ? (
+                    categoryRoles.map((role) => (
+                      <div
+                        key={role.id}
+                        className="rounded-lg px-3 py-2.5 text-xs text-[#716a61] transition hover:bg-[#faf8f4]"
+                      >
+                        {role.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2.5 text-[10px] text-[#aaa39a]">
+                      نقشی برای این دسته ثبت نشده
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

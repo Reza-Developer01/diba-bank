@@ -153,13 +153,13 @@ export default function App() {
         />
         <ContractorSidebar
           categories={categories.filter((category) => category.parent === null)}
+          allCategories={categories}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
         />
         {/* <LeftRail /> */}
       </div>
       <MobileDrawer
-        onHowMet={() => setHowMetModalOpen(true)}
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         activeCategory={activeCategory}
@@ -167,6 +167,7 @@ export default function App() {
         onAddRole={() => setRoleModalOpen(true)}
         onAddCategory={() => setCategoryModalOpen(true)}
         categories={categories.filter((category) => category.parent === null)}
+        allCategories={categories}
       />
       <RoleModal
         open={roleModalOpen}
