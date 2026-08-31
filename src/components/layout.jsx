@@ -90,8 +90,8 @@ export function MainSidebar({
 }) {
   const items = [
     { icon: Users, label: "همه مخاطبین", active: true },
-    { icon: UserCog, label: "تنظیمات نام کاربری و رمز ورود" },
-    { icon: Sparkles, label: "نحوه آشنایی" },
+    { icon: UserCog, label: "تنظیمات نام کاربری و رمز ورود ( به زودی )" },
+    { icon: Sparkles, label: "نحوه آشنایی", accent: true },
     { icon: Users, label: "افزودن نقش", accent: true },
     { icon: FolderPlus, label: "افزودن دسته", accent: true },
   ];
@@ -154,7 +154,7 @@ export function ContractorSidebar({
       <div className="sticky top-0 px-5 py-5">
         <div className="mb-4 flex items-center gap-2 text-sm font-bold text-[#4a433b]">
           <Users className="size-4.25 text-[#b48634]" />
-          پیمانکاران
+          گروه بندی
         </div>
 
         <div className="space-y-1">
@@ -273,7 +273,7 @@ export function MobileDrawer({
         <div className="px-5 py-5">
           <div className="mb-3 flex items-center gap-2 text-sm font-bold text-[#4a433b]">
             <Users className="size-4.25 text-[#b48634]" />
-            پیمانکاران
+            گروه بندی
           </div>
 
           <MobileContractorCategories
@@ -295,7 +295,7 @@ function MobileMenuItems({
 }) {
   const items = [
     [Users, "همه مخاطبین"],
-    [UserCog, "تنظیمات نام کاربری و رمز ورود"],
+    [UserCog, "تنظیمات نام کاربری و رمز ورود ( به زودی )"],
     [Sparkles, "نحوه آشنایی"],
     [Users, "افزودن نقش"],
     [FolderPlus, "افزودن دسته"],

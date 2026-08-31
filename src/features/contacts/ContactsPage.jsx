@@ -215,7 +215,7 @@ export default function ContactsPage({
             </div>
 
             <p className="mt-1 text-[11px] text-[#9b948a]">
-              مدیریت و پیگیری ارتباط با مخاطبین و پیمانکاران
+              مدیریت و پیگیری ارتباط با مخاطبین و گروه بندی
             </p>
           </div>
         </div>

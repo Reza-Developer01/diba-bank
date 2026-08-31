@@ -147,6 +147,33 @@ export function ContactModal({
       return false;
     }
 
+    if (form.website?.trim()) {
+      const website = form.website.trim();
+
+      if (!/^https?:\/\//i.test(website)) {
+        alert("آدرس وب‌سایت باید با http:// یا https:// شروع شود.");
+        return false;
+      }
+
+      try {
+        const url = new URL(website);
+        const hostname = url.hostname;
+
+        const domainRegex =
+          /^(?:www\.)?[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.[a-zA-Z]{2,}$/;
+
+        if (!domainRegex.test(hostname)) {
+          alert(
+            "لطفاً یک آدرس وب‌سایت معتبر مثل https://example.com وارد کنید.",
+          );
+          return false;
+        }
+      } catch {
+        alert("لطفاً یک آدرس وب‌سایت معتبر وارد کنید.");
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -229,7 +256,7 @@ export function ContactModal({
                   form.categoryId
                     ? roleOptions.length > 0
                       ? "انتخاب نقش"
-                      : "برای این دسته نقشی ثبت نشده است"
+                      : "ابتدا گروه بندی اصلی رو انتخاب کنید"
                     : "ابتدا دسته را انتخاب کنید"
                 }
                 disabled={!form.categoryId || roleOptions.length === 0}
@@ -317,6 +344,26 @@ export function ContactModal({
                 <input
                   value={form.name_city ?? ""}
                   onChange={(e) => update("name_city", e.target.value)}
+                  onBlur={() => {
+                    const city = form.name_city?.trim();
+
+                    if (!city) return;
+
+                    const currentAddress = form.address?.trim();
+
+                    // اگر آدرس از قبل با نام شهر شروع نشده، شهر را به ابتدای آن اضافه کن
+                    if (
+                      !currentAddress ||
+                      !currentAddress.startsWith(`${city}،`)
+                    ) {
+                      update(
+                        "address",
+                        currentAddress
+                          ? `${city}، ${currentAddress}`
+                          : `${city}، `,
+                      );
+                    }
+                  }}
                   placeholder="تهران"
                   className="field-input pr-10"
                   style={{ paddingRight: "32px" }}
