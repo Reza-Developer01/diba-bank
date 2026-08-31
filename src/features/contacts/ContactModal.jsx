@@ -179,10 +179,12 @@ export function ContactModal({
       label: item.name,
     }));
 
-  const roleOptions = roles.map((item) => ({
-    value: item.id,
-    label: item.name,
-  }));
+  const roleOptions = roles
+    .filter((item) => String(item.parent) === String(form.categoryId))
+    .map((item) => ({
+      value: item.id,
+      label: item.name,
+    }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#211c16]/35 p-2 sm:p-5 backdrop-blur-[2px]">
@@ -223,14 +225,24 @@ export function ContactModal({
                 value={form.role ?? ""}
                 onChange={(value) => update("role", value)}
                 options={roleOptions}
-                placeholder="انتخاب نقش"
+                placeholder={
+                  form.categoryId
+                    ? roleOptions.length > 0
+                      ? "انتخاب نقش"
+                      : "برای این دسته نقشی ثبت نشده است"
+                    : "ابتدا دسته را انتخاب کنید"
+                }
+                disabled={!form.categoryId || roleOptions.length === 0}
               />
             </Field>
 
             <Field label="دسته‌بندی" required>
               <Select
                 value={form.categoryId ?? ""}
-                onChange={(value) => update("categoryId", value)}
+                onChange={(value) => {
+                  update("categoryId", value);
+                  update("role", "");
+                }}
                 options={categoryOptions}
                 placeholder="انتخاب دسته"
               />
