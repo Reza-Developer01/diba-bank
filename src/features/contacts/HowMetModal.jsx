@@ -55,15 +55,14 @@ export function HowMetModal({ open, onClose, onHowMetChange }) {
     try {
       if (editingId) {
         await updateHowMet(editingId, value);
-      } else {
-        await createHowMet(value);
+
+        window.location.reload();
+        return;
       }
+
+      await createHowMet(value);
 
       await loadHowMet();
-
-      if (onHowMetChange) {
-        await onHowMetChange();
-      }
 
       resetForm();
     } catch (error) {
@@ -92,10 +91,6 @@ export function HowMetModal({ open, onClose, onHowMetChange }) {
       await deleteHowMet(id);
 
       setItems((current) => current.filter((item) => item.id !== id));
-
-      if (onHowMetChange) {
-        await onHowMetChange();
-      }
 
       if (editingId === id) {
         resetForm();

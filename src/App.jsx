@@ -78,6 +78,8 @@ export default function App() {
         category.id === id ? updatedRole : category,
       ),
     );
+
+    window.location.reload();
   };
 
   const handleDeleteRole = async (id) => {
@@ -107,6 +109,8 @@ export default function App() {
         category.id === id ? updatedCategory : category,
       ),
     );
+
+    window.location.reload();
   };
 
   const handleDeleteCategory = async (id) => {
