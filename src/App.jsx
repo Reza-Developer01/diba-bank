@@ -176,6 +176,7 @@ export default function App() {
         onHowMet={() => setHowMetModalOpen(true)}
         categories={categories.filter((category) => category.parent === null)}
         allCategories={categories}
+        contacts={contacts}
       />
       <RoleModal
         open={roleModalOpen}
