@@ -194,7 +194,7 @@ export function HowMetModal({ open, onClose, onHowMetChange }) {
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-[#e9e5df]">
+            <div className="overflow-hidden rounded-xl border border-[#e9e5df] max-h-62.5 space-y-2 overflow-y-auto pl-1">
               {loading ? (
                 <div className="py-12 text-center text-[11px] text-[#9d968e]">
                   در حال دریافت اطلاعات...
