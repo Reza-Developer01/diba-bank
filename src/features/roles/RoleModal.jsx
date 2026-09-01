@@ -121,7 +121,7 @@ export function RoleModal({
             </div>
 
             <h2 className="text-[14px] font-extrabold text-[#3f3932]">
-              مدیریت نقش ها
+              مدیریت دسته
             </h2>
           </div>
 
