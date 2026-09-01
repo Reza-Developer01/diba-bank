@@ -247,7 +247,7 @@ export function ContactModal({
               </div>
             </Field>
 
-            <Field label="نقش" required>
+            <Field label="دسته بندی" required>
               <Select
                 value={form.role ?? ""}
                 onChange={(value) => update("role", value)}
@@ -255,15 +255,15 @@ export function ContactModal({
                 placeholder={
                   form.categoryId
                     ? roleOptions.length > 0
-                      ? "انتخاب نقش"
-                      : "ابتدا گروه بندی اصلی رو انتخاب کنید"
+                      ? "انتخاب دسته بندی"
+                      : "ابتدا نقش رو انتخاب کنید"
                     : "ابتدا دسته را انتخاب کنید"
                 }
                 disabled={!form.categoryId || roleOptions.length === 0}
               />
             </Field>
 
-            <Field label="دسته‌بندی" required>
+            <Field label="نقش" required>
               <Select
                 value={form.categoryId ?? ""}
                 onChange={(value) => {
@@ -271,7 +271,7 @@ export function ContactModal({
                   update("role", "");
                 }}
                 options={categoryOptions}
-                placeholder="انتخاب دسته"
+                placeholder="انتخاب نقش"
               />
             </Field>
           </section>
