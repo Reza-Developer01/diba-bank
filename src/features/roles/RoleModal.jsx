@@ -137,29 +137,9 @@ export function RoleModal({
         {/* FORM */}
 
         <form onSubmit={handleSubmit} className="px-5 py-5 sm:px-6 sm:py-6">
-          <label className="block">
+          <label className="mb-4 block">
             <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
-              نام نقش <b className="text-[#d65d55]">*</b>
-            </span>
-
-            <input
-              autoFocus
-              value={name}
-              onChange={(event) => {
-                setName(event.target.value);
-
-                if (error) {
-                  setError("");
-                }
-              }}
-              placeholder="مثلاً ناظر پروژه"
-              className="field-input"
-            />
-          </label>
-
-          <label className="mt-4 block">
-            <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
-              دسته والد <b className="text-[#d65d55]">*</b>
+              انتخاب نقش <b className="text-[#d65d55]">*</b>
             </span>
 
             <select
@@ -181,6 +161,26 @@ export function RoleModal({
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
+              نام دسته <b className="text-[#d65d55]">*</b>
+            </span>
+
+            <input
+              autoFocus
+              value={name}
+              onChange={(event) => {
+                setName(event.target.value);
+
+                if (error) {
+                  setError("");
+                }
+              }}
+              placeholder="مثلاً ناظر پروژه"
+              className="field-input"
+            />
           </label>
 
           {error && (
