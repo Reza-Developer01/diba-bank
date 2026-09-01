@@ -180,9 +180,9 @@ export function ContactModal({
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
     setSaving(true);
 
