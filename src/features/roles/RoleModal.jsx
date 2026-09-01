@@ -196,7 +196,7 @@ export function RoleModal({
               دسته های موجود
             </div>
 
-            <div className="space-y-2">
+            <div className="max-h-62.5 space-y-2 overflow-y-auto pl-1">
               {roles.length === 0 ? (
                 <div className="py-4 text-center text-[10px] text-[#9d968e]">
                   هنوز دسته ای ثبت نشده است.
