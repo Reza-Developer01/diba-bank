@@ -1,8 +1,10 @@
+import * as XLSX from "xlsx";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
   EllipsisVertical,
+  FileSpreadsheet,
   Globe2,
   MapPin,
   Phone,
@@ -212,6 +214,48 @@ export default function ContactsPage({
     }
   };
 
+  const handleExportExcel = () => {
+    if (contacts.length === 0) {
+      alert("مخاطبی برای خروجی گرفتن وجود ندارد.");
+      return;
+    }
+
+    const excelData = contacts.map((contact) => ({
+      شناسه: contact.id,
+      "نام و نام خانوادگی": contact.fullname || "",
+      دسته‌بندی: contact.category_name || "",
+      نقش: contact.role_name || "",
+      "شماره تماس": (contact.phones ?? [])
+        .map((phone) => phone.phone)
+        .join("، "),
+      "نوع شماره": (contact.phones ?? [])
+        .map((phone) =>
+          phone.category === "fixed"
+            ? "ثابت"
+            : phone.category === "mobile"
+              ? "همراه"
+              : phone.category || "",
+        )
+        .join("، "),
+      "آدرس اینترنتی": contact.website || "",
+      شهر: contact.name_city || "",
+      آدرس: contact.address || "",
+      "نحوه آشنایی": contact.how_met_name || "",
+      رفتار: contact.behavior_display || "",
+      توضیحات: contact.description || "",
+      "تاریخ ایجاد": contact.created_at || "",
+      "تاریخ بروزرسانی": contact.updated_at || "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "مخاطبین");
+
+    XLSX.writeFile(workbook, "contacts.xlsx");
+  };
+
   return (
     <main className="min-w-0 flex-1 bg-[#f8f7f4]">
       <div className="px-4 py-5 sm:px-7 sm:py-6">
@@ -233,6 +277,15 @@ export default function ContactsPage({
               مدیریت و پیگیری ارتباط با مخاطبین و گروه بندی
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            className="flex h-9 items-center gap-2 rounded-lg border border-[#e4dfd7] bg-white px-3 text-xs font-medium text-[#716a62] transition hover:bg-[#faf8f4] hover:text-[#8b682f]"
+          >
+            <FileSpreadsheet className="size-4" />
+            خروجی اکسل
+          </button>
         </div>
 
         {/* FILTERS */}
