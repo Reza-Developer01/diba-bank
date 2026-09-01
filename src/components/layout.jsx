@@ -179,7 +179,12 @@ export function ContractorSidebar({
 
                   <div className="flex items-center gap-2">
                     <span className="min-w-5 rounded-full bg-[#f3eee6] px-1.5 py-0.5 text-center text-[9px] font-semibold text-[#9a7946]">
-                      {categoryRoles.length}
+                      {
+                        contacts.filter(
+                          (contact) =>
+                            String(contact.category) === String(category.id),
+                        ).length
+                      }
                     </span>
 
                     <span
@@ -419,7 +424,12 @@ function MobileContractorCategories({
 
               <div className="flex items-center gap-2">
                 <span className="min-w-5 rounded-full bg-[#f3eee6] px-1.5 py-0.5 text-center text-[9px] font-semibold text-[#9a7946]">
-                  {categoryRoles.length}
+                  {
+                    contacts.filter(
+                      (contact) =>
+                        String(contact.category) === String(category.id),
+                    ).length
+                  }
                 </span>
 
                 <span
