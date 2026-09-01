@@ -333,9 +333,9 @@ function MobileMenuItems({
           key={label}
           onClick={
             label === "افزودن دسته"
-              ? onAddCategory
+              ? onAddRole
               : label === "افزودن نقش"
-                ? onAddRole
+                ? onAddCategory
                 : label === "نحوه آشنایی"
                   ? onHowMet
                   : undefined
