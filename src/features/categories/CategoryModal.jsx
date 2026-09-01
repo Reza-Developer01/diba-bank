@@ -233,7 +233,7 @@ export function CategoryModal({
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-[#e9e5df]">
+            <div className="overflow-hidden rounded-xl border border-[#e9e5df] max-h-62.5 space-y-2 overflow-y-auto pl-1">
               {rootCategories.length === 0 ? (
                 <div className="py-10 text-center text-[10px] text-[#9d968e]">
                   هنوز دسته‌ای ثبت نشده است.
