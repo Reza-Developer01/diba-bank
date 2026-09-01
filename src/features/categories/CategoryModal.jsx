@@ -126,11 +126,11 @@ export function CategoryModal({
 
             <div>
               <h2 className="text-[14px] font-extrabold text-[#3f3932]">
-                افزودن دسته
+                افزودن نقش
               </h2>
 
               <p className="mt-0.5 text-[9px] text-[#9b948a]">
-                مدیریت دسته‌های مخاطبین
+                مدیریت نقش های مخاطبین
               </p>
             </div>
           </div>
@@ -156,13 +156,13 @@ export function CategoryModal({
           >
             <div className="mb-3">
               <span className="text-[11px] font-semibold text-[#4d463e]">
-                {editingId ? "ویرایش دسته" : "افزودن دسته"}
+                {editingId ? "ویرایش نقش" : "افزودن نقش"}
               </span>
             </div>
 
             <label className="block">
               <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
-                نام دسته <b className="text-[#d65d55]">*</b>
+                نام نقش <b className="text-[#d65d55]">*</b>
               </span>
 
               <input
@@ -175,7 +175,7 @@ export function CategoryModal({
                     setError("");
                   }
                 }}
-                placeholder="مثلاً تأسیسات"
+                placeholder="مثلاً پیمانکاران"
                 className="field-input"
               />
             </label>
@@ -215,7 +215,7 @@ export function CategoryModal({
                   ? "در حال ذخیره..."
                   : editingId
                     ? "ذخیره تغییرات"
-                    : "افزودن دسته"}
+                    : "افزودن نقش"}
               </button>
             </div>
           </form>
@@ -225,7 +225,7 @@ export function CategoryModal({
           <div className="mt-5">
             <div className="mb-3 flex items-center justify-between">
               <div className="text-[10px] font-bold text-[#756d63]">
-                دسته‌های موجود
+                نقش های موجود
               </div>
 
               <span className="rounded-full bg-[#eee8dd] px-2 py-0.5 text-[9px] font-semibold text-[#8b7757]">

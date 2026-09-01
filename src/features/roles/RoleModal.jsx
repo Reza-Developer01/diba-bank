@@ -121,7 +121,7 @@ export function RoleModal({
             </div>
 
             <h2 className="text-[14px] font-extrabold text-[#3f3932]">
-              مدیریت نقش‌ها
+              مدیریت دسته ها
             </h2>
           </div>
 
@@ -153,7 +153,7 @@ export function RoleModal({
               }}
               className="field-input"
             >
-              <option value="">انتخاب دسته</option>
+              <option value="">ابتدا نقش رو انتخاب کنید</option>
 
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -193,13 +193,13 @@ export function RoleModal({
 
           <div className="mt-5 rounded-xl border border-[#eee8de] bg-[#fcfaf7] p-4">
             <div className="mb-3 text-[10px] font-bold text-[#756d63]">
-              نقش‌های موجود
+              دسته های موجود
             </div>
 
             <div className="space-y-2">
               {roles.length === 0 ? (
                 <div className="py-4 text-center text-[10px] text-[#9d968e]">
-                  هنوز نقشی ثبت نشده است.
+                  هنوز دسته ای ثبت نشده است.
                 </div>
               ) : (
                 roles.map((role) => (
@@ -279,7 +279,7 @@ export function RoleModal({
                 ? "در حال ذخیره..."
                 : editingId
                   ? "ذخیره تغییرات"
-                  : "افزودن نقش"}
+                  : "افزودن دسته"}
             </button>
           </div>
         </form>
