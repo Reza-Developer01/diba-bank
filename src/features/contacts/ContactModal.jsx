@@ -480,7 +480,7 @@ function Field({ label, required, children, className = "" }) {
   return (
     <label className={`block ${className}`}>
       <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
-        {label} {required && <b className="text-[#d65d55]">*</b>}
+        {label}
       </span>
       {children}
     </label>
