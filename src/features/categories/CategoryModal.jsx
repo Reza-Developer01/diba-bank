@@ -35,7 +35,7 @@ export function CategoryModal({
     const normalizedName = name.trim();
 
     if (!normalizedName) {
-      setError("نام دسته را وارد کنید.");
+      setError("نام نقش را وارد کنید.");
       return;
     }
 

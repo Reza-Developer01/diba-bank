@@ -43,7 +43,7 @@ export function RoleModal({
     const normalizedName = name.trim();
 
     if (!normalizedName) {
-      setError("نام نقش را وارد کنید.");
+      setError("نام دسته را وارد کنید.");
       return;
     }
 
