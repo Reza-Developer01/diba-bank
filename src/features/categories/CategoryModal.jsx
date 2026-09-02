@@ -261,7 +261,7 @@ export function CategoryModal({
 
                           {hasChildren && (
                             <div className="mt-0.5 text-[8px] text-[#aaa198]">
-                              دارای نقش
+                              دارای دسته بندی
                             </div>
                           )}
                         </div>
