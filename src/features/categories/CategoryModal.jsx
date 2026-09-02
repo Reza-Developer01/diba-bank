@@ -46,7 +46,7 @@ export function CategoryModal({
     );
 
     if (duplicate) {
-      setError("این دسته قبلاً ثبت شده است.");
+      setError("این نقش قبلاً ثبت شده است.");
       return;
     }
 

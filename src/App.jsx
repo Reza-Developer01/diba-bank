@@ -33,6 +33,7 @@ export default function App() {
   const [howMetModalOpen, setHowMetModalOpen] = useState(false);
   const [howMetOptions, setHowMetOptions] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [contactsRefreshKey, setContactsRefreshKey] = useState(0);
 
   const roles = categories.filter((category) => category.parent !== null);
 
@@ -67,8 +68,7 @@ export default function App() {
     const createdRole = await createRole(name, parentId);
 
     setCategories((currentCategories) => [...currentCategories, createdRole]);
-
-    setRoleModalOpen(false);
+    setContactsRefreshKey((key) => key + 1);
   };
 
   const handleUpdateRole = async (id, name, parentId) => {
@@ -80,7 +80,7 @@ export default function App() {
       ),
     );
 
-    window.location.reload();
+    setContactsRefreshKey((key) => key + 1);
   };
 
   const handleDeleteRole = async (id) => {
@@ -89,6 +89,8 @@ export default function App() {
     setCategories((currentCategories) =>
       currentCategories.filter((category) => category.id !== id),
     );
+
+    setContactsRefreshKey((key) => key + 1);
   };
 
   const handleCreateCategory = async (name) => {
@@ -99,7 +101,7 @@ export default function App() {
       createdCategory,
     ]);
 
-    setCategoryModalOpen(false);
+    setContactsRefreshKey((key) => key + 1);
   };
 
   const handleEditCategory = async (id, name) => {
@@ -111,7 +113,7 @@ export default function App() {
       ),
     );
 
-    window.location.reload();
+    setContactsRefreshKey((key) => key + 1);
   };
 
   const handleDeleteCategory = async (id) => {
@@ -121,7 +123,8 @@ export default function App() {
       currentCategories.filter((category) => category.id !== id),
     );
 
-    // اگر دسته حذف‌شده دسته فعال بوده، برگرد به همه مخاطبین
+    setContactsRefreshKey((key) => key + 1);
+
     if (String(activeCategory) === String(id)) {
       setActiveCategory("all");
     }
@@ -156,6 +159,7 @@ export default function App() {
           categories={categories}
           howMetOptions={howMetOptions}
           onContactsChange={setContacts}
+          refreshKey={contactsRefreshKey}
         />
         <ContractorSidebar
           categories={categories.filter((category) => category.parent === null)}

@@ -48,7 +48,7 @@ export function RoleModal({
     }
 
     if (!parentId) {
-      setError("دسته والد را انتخاب کنید.");
+      setError("دسته را انتخاب کنید.");
       return;
     }
 

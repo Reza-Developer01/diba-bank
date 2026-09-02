@@ -50,6 +50,7 @@ export default function ContactsPage({
   categories = [],
   howMetOptions,
   onContactsChange,
+  refreshKey,
 }) {
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState("");
@@ -67,6 +68,13 @@ export default function ContactsPage({
   const [importRows, setImportRows] = useState([]);
   const [importOpen, setImportOpen] = useState(false);
   const [importing, setImporting] = useState(false);
+
+  useEffect(() => {
+    getContacts().then((data) => {
+      setContacts(data);
+      onContactsChange?.(data);
+    });
+  }, [onContactsChange, refreshKey]);
 
   useEffect(() => {
     getContacts().then((data) => {
@@ -497,7 +505,7 @@ export default function ContactsPage({
                 value: String(item.id),
                 label: item.name,
               }))}
-            placeholder="همه دسته‌ها"
+            placeholder="همه نقش ها"
             className="w-auto"
           />
 
@@ -508,7 +516,7 @@ export default function ContactsPage({
               value: String(item.id),
               label: item.name,
             }))}
-            placeholder="همه نقش‌ها"
+            placeholder="همه دسته ها"
             className="w-auto"
           />
 
