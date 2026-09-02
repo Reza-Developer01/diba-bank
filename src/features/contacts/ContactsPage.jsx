@@ -397,14 +397,17 @@ export default function ContactsPage({
     const results = await Promise.allSettled(
       validRows.map((row) =>
         createContact({
-          fullname: row.fullname,
-          category: row.category || null,
+          name: row.fullname,
+          categoryId: row.category || null,
           role: row.role || null,
-          phones: row.phones,
+          phones: row.phones.map((phone) => ({
+            number: phone.phone,
+            type: phone.category,
+          })),
           website: row.website,
           name_city: row.name_city,
           address: row.address,
-          how_met_name: row.how_met_name || null,
+          how_met: row.how_met_name || null,
           behavior: row.behavior || null,
           description: row.description,
         }),
