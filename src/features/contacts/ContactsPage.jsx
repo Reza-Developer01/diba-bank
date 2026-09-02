@@ -435,7 +435,7 @@ export default function ContactsPage({
       <div className="px-4 py-5 sm:px-7 sm:py-6">
         {/* HEADER */}
 
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between flex-wrap gap-5">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[19px] font-extrabold text-[#3e3831]">
