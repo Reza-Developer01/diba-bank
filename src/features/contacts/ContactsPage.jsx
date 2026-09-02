@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,6 +10,7 @@ import {
   Phone,
   Plus,
   SlidersHorizontal,
+  Upload,
   UserRound,
 } from "lucide-react";
 
@@ -61,6 +62,11 @@ export default function ContactsPage({
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   // const [howMetOptions, setHowMetOptions] = useState([]);
+
+  const fileInputRef = useRef(null);
+  const [importRows, setImportRows] = useState([]);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     getContacts().then((data) => {
@@ -155,6 +161,56 @@ export default function ContactsPage({
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
+
+  const topCategories = useMemo(
+    () => categories.filter((item) => item.parent === null),
+    [categories],
+  );
+
+  const reverseBehaviorMap = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(behaviorMap).map(([key, value]) => [value.label, key]),
+      ),
+    [],
+  );
+
+  const findIdByName = (list, name) => {
+    if (!name) return "";
+    const match = list.find((item) => item.name === String(name).trim());
+    return match ? match.id : "";
+  };
+
+  const findHowMetIdByName = (name) => {
+    if (!name) return "";
+    const list = howMetOptions?.length ? howMetOptions : sources;
+    const match = list.find((item) => item.name === String(name).trim());
+    return match ? match.id : "";
+  };
+
+  const parsePhonesCell = (cell) => {
+    if (!cell) return [];
+
+    return String(cell)
+      .split("،")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => {
+        // فرمت هر بخش تو خروجی: "09123456789 همراه"
+        const match = part.match(/^(.*?)(?:\s+(ثابت|همراه))?$/);
+        const phone = match?.[1]?.trim() || part;
+        const typeLabel = match?.[2];
+
+        const phoneCategory =
+          typeLabel === "ثابت"
+            ? "fixed"
+            : typeLabel === "همراه"
+              ? "mobile"
+              : "mobile";
+
+        return { phone, category: phoneCategory };
+      });
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -256,6 +312,105 @@ export default function ContactsPage({
     XLSX.writeFile(workbook, "contacts.xlsx");
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      const parsed = rows.map((row, index) => {
+        const fullname = String(row["نام و نام خانوادگی"] || "").trim();
+        const categoryName = row["دسته‌بندی"];
+        const roleName = row["نقش"];
+        const howMetName = row["نحوه آشنایی"];
+        const behaviorLabel = row["رفتار"];
+
+        return {
+          _rowId: `${index}-${Date.now()}`,
+          fullname,
+          category: findIdByName(topCategories, categoryName),
+          category_name: categoryName || "",
+          role: findIdByName(roles, roleName),
+          role_name: roleName || "",
+          phones: parsePhonesCell(row["شماره تماس"]),
+          website: String(row["آدرس اینترنتی"] || "").trim(),
+          name_city: String(row["شهر"] || "").trim(),
+          address: String(row["آدرس"] || "").trim(),
+          how_met_name: findHowMetIdByName(howMetName),
+          how_met_display: howMetName || "",
+          behavior: reverseBehaviorMap[behaviorLabel] || "",
+          behavior_display: behaviorLabel || "",
+          description: String(row["توضیحات"] || "").trim(),
+          _valid: Boolean(fullname),
+        };
+      });
+
+      setImportRows(parsed);
+      setImportOpen(true);
+    } catch (error) {
+      console.error("EXCEL IMPORT PARSE ERROR:", error);
+      alert("خواندن فایل اکسل با خطا مواجه شد. فرمت فایل را بررسی کنید.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const handleRemoveImportRow = (rowId) => {
+    setImportRows((rows) => rows.filter((row) => row._rowId !== rowId));
+  };
+
+  const handleConfirmImport = async () => {
+    const validRows = importRows.filter((row) => row._valid);
+
+    if (validRows.length === 0) {
+      alert("هیچ رکورد معتبری برای ذخیره وجود ندارد.");
+      return;
+    }
+
+    setImporting(true);
+
+    const results = await Promise.allSettled(
+      validRows.map((row) =>
+        createContact({
+          fullname: row.fullname,
+          category: row.category || null,
+          role: row.role || null,
+          phones: row.phones,
+          website: row.website,
+          name_city: row.name_city,
+          address: row.address,
+          how_met_name: row.how_met_name || null,
+          behavior: row.behavior || null,
+          description: row.description,
+        }),
+      ),
+    );
+
+    const succeeded = results.filter((r) => r.status === "fulfilled").length;
+    const failed = results.length - succeeded;
+
+    const updatedContacts = await getContacts();
+    setContacts(updatedContacts);
+    onContactsChange?.(updatedContacts);
+
+    setImporting(false);
+    setImportOpen(false);
+    setImportRows([]);
+
+    alert(
+      `${succeeded} مخاطب با موفقیت ذخیره شد.${failed ? ` ${failed} مورد با خطا مواجه شد.` : ""}`,
+    );
+  };
+
   return (
     <main className="min-w-0 flex-1 bg-[#f8f7f4]">
       <div className="px-4 py-5 sm:px-7 sm:py-6">
@@ -278,14 +433,33 @@ export default function ContactsPage({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleExportExcel}
-            className="flex h-9 items-center gap-2 rounded-lg border border-[#e4dfd7] bg-white px-3 text-xs font-medium text-[#716a62] transition hover:bg-[#faf8f4] hover:text-[#8b682f]"
-          >
-            <FileSpreadsheet className="size-4" />
-            خروجی اکسل
-          </button>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            <button
+              type="button"
+              onClick={handleImportClick}
+              className="flex h-9 items-center gap-2 rounded-lg border border-[#e4dfd7] bg-white px-3 text-xs font-medium text-[#716a62] transition hover:bg-[#faf8f4] hover:text-[#8b682f]"
+            >
+              <Upload className="size-4" />
+              ایمپورت اکسل
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              className="flex h-9 items-center gap-2 rounded-lg border border-[#e4dfd7] bg-white px-3 text-xs font-medium text-[#716a62] transition hover:bg-[#faf8f4] hover:text-[#8b682f]"
+            >
+              <FileSpreadsheet className="size-4" />
+              خروجی اکسل
+            </button>
+          </div>
         </div>
 
         {/* FILTERS */}
@@ -658,6 +832,99 @@ export default function ContactsPage({
         categories={categories}
         howMetOptions={howMetOptions}
       />
+
+      {importOpen && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30 p-4">
+          <div className="max-h-[85vh] w-full max-w-4xl overflow-hidden rounded-xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-[#eeeae4] px-5 py-4">
+              <h2 className="text-sm font-bold text-[#3e3831]">
+                پیش‌نمایش ایمپورت ({importRows.length} ردیف)
+              </h2>
+              <button
+                onClick={() => {
+                  setImportOpen(false);
+                  setImportRows([]);
+                }}
+                className="text-xs text-[#9b948a] hover:text-[#6e5124]"
+              >
+                بستن
+              </button>
+            </div>
+
+            <div className="max-h-[60vh] overflow-auto px-5 py-3">
+              <table className="w-full min-w-150 text-right text-[11px]">
+                <thead>
+                  <tr className="text-[10px] text-[#8f887f]">
+                    <th className="py-2">نام</th>
+                    <th className="py-2">دسته‌بندی</th>
+                    <th className="py-2">نقش</th>
+                    <th className="py-2">تلفن</th>
+                    <th className="py-2">وضعیت</th>
+                    <th className="py-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importRows.map((row) => (
+                    <tr key={row._rowId} className="border-t border-[#f1eee9]">
+                      <td className="py-2">{row.fullname || "—"}</td>
+                      <td className="py-2">
+                        {row.category ? (
+                          row.category_name
+                        ) : (
+                          <span className="text-red-500">
+                            {row.category_name || "—"} (یافت نشد)
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2">
+                        {row.role ? (
+                          row.role_name
+                        ) : (
+                          <span className="text-amber-600">
+                            {row.role_name || "—"}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2">
+                        {row.phones.map((p) => p.phone).join("، ") || "—"}
+                      </td>
+                      <td className="py-2">
+                        {row._valid ? (
+                          <Badge tone="blue">معتبر</Badge>
+                        ) : (
+                          <Badge tone="red">ناقص</Badge>
+                        )}
+                      </td>
+                      <td className="py-2">
+                        <button
+                          onClick={() => handleRemoveImportRow(row._rowId)}
+                          className="text-[10px] text-red-500 hover:underline"
+                        >
+                          حذف
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-[#eeeae4] px-5 py-4">
+              <span className="text-[10px] text-[#9b948a]">
+                {importRows.filter((r) => r._valid).length} ردیف معتبر برای
+                ذخیره
+              </span>
+              <button
+                onClick={handleConfirmImport}
+                disabled={importing}
+                className="flex h-9 items-center gap-2 rounded-lg bg-[#b48634] px-4 text-xs font-semibold text-white hover:bg-[#a4772b] disabled:opacity-50"
+              >
+                {importing ? "در حال ذخیره..." : "تأیید و ذخیره"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <button
         onClick={openCreate}

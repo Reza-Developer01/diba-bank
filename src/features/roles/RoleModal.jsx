@@ -139,7 +139,7 @@ export function RoleModal({
         <form onSubmit={handleSubmit} className="px-5 py-5 sm:px-6 sm:py-6">
           <label className="mb-4 block">
             <span className="mb-2 block text-[11px] font-semibold text-[#4d463e]">
-              انتخاب نقش <b className="text-[#d65d55]">*</b>
+              انتخاب دسته <b className="text-[#d65d55]">*</b>
             </span>
 
             <select
