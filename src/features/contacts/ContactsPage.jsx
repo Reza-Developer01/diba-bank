@@ -342,12 +342,20 @@ export default function ContactsPage({
         const howMetName = row["نحوه آشنایی"];
         const behaviorLabel = row["رفتار"];
 
+        const matchedRole = roles.find(
+          (item) => item.name === String(roleName || "").trim(),
+        );
+
+        const resolvedCategoryId = matchedRole
+          ? matchedRole.parent
+          : findIdByName(topCategories, categoryName);
+
         return {
           _rowId: `${index}-${Date.now()}`,
           fullname,
-          category: findIdByName(topCategories, categoryName),
+          category: resolvedCategoryId || "",
           category_name: categoryName || "",
-          role: findIdByName(roles, roleName),
+          role: matchedRole ? matchedRole.id : "",
           role_name: roleName || "",
           phones: parsePhonesCell(row["شماره تماس"]),
           website: String(row["آدرس اینترنتی"] || "").trim(),
